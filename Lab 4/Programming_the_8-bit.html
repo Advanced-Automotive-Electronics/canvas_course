@@ -1,0 +1,312 @@
+<!-- =======================
+     Step 1: Import Libraries
+     ======================= -->
+<h2>
+  <strong
+    >Step-by-Step Guide: Controlling an RGB LED's Red Intensity Using
+    PWM</strong
+  >
+</h2>
+<p>
+  In this lab, you will interactively control the brightness of the red LED on
+  your RGB module using Pulse Width Modulation (PWM). The brightness will be
+  controlled by entering a value between 0 and 255, where 0 is off and 255 is
+  fully bright. This range corresponds to the 8-bit color model commonly used in
+  electronics.
+</p>
+
+<h3><strong>1. Import Required Libraries</strong></h3>
+<p>
+  At the beginning of the program, we need to import the necessary libraries to
+  interact with the Raspberry Pi's GPIO pins and manage the timing of the PWM
+  signal.
+</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #c678dd;">import</span> <span style="color: #98c379;">RPi.GPIO</span> <span style="color: #c678dd;">as</span> <span style="color: #98c379;">GPIO</span>
+     <span style="color: #c678dd;">import</span> <span style="color: #61afef;">time</span>
+         </pre>
+</div>
+<ul>
+  <li>
+    <code
+      style="
+        background-color: #2e3440;
+        color: #d8dee9;
+        padding: 2px 4px;
+        border-radius: 3px;
+      "
+      >RPi.GPIO</code
+    >: Allows us to control the GPIO pins on the Raspberry Pi.
+  </li>
+  <li>
+    <code
+      style="
+        background-color: #2e3440;
+        color: #d8dee9;
+        padding: 2px 4px;
+        border-radius: 3px;
+      "
+      >time</code
+    >: Provides a way to add delays to our program.
+  </li>
+</ul>
+
+<!-- =======================
+          Step 2: Define Constants
+          ======================= -->
+<h3><strong>2. Define Constants</strong></h3>
+<p>Next, we define some constants that will be used throughout the program.</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">RED_PIN</span> = <span style="color: #d19a66;">11</span> <span style="color: #98c379;"># The physical pin connected to the red LED</span>
+     <span style="color: #61afef;">COLOR_RANGE</span> = <span style="color: #d19a66;">255</span> <span style="color: #98c379;"># The color range for an 8-bit color model (0 to 255)</span>
+     <span style="color: #61afef;">PWM_FREQUENCY</span> = <span style="color: #d19a66;">2000</span> <span style="color: #98c379;"># Frequency of the PWM signal (in Hertz)</span>
+         </pre>
+</div>
+<ul>
+  <li>
+    <code
+      style="
+        background-color: #2e3440;
+        color: #d8dee9;
+        padding: 2px 4px;
+        border-radius: 3px;
+      "
+      >RED_PIN</code
+    >: The physical pin number on the Raspberry Pi board where the red LED is
+    connected.
+  </li>
+  <li>
+    <code
+      style="
+        background-color: #2e3440;
+        color: #d8dee9;
+        padding: 2px 4px;
+        border-radius: 3px;
+      "
+      >COLOR_RANGE</code
+    >: The total number of color values available in an 8-bit model (from 0 to
+    255).
+  </li>
+  <li>
+    <code
+      style="
+        background-color: #2e3440;
+        color: #d8dee9;
+        padding: 2px 4px;
+        border-radius: 3px;
+      "
+      >PWM_FREQUENCY</code
+    >: The frequency at which the PWM signal will be generated.
+  </li>
+</ul>
+
+<!-- =======================
+          Step 3: Setup GPIO Pins
+          ======================= -->
+<h3><strong>3. Set Up the GPIO Pins</strong></h3>
+<p>
+  Now we configure the GPIO pins on the Raspberry Pi and prepare the pin for
+  PWM.
+</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #98c379;">GPIO.setmode</span>(<span style="color: #d19a66;">GPIO.BOARD</span>) <span style="color: #98c379;"># Use physical pin numbering</span>
+     <span style="color: #98c379;">GPIO.setup</span>(<span style="color: #61afef;">RED_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>) <span style="color: #98c379;"># Set the red LED pin as an output</span>
+     <span style="color: #61afef;">RED_PWM</span> = <span style="color: #98c379;">GPIO.PWM</span>(<span style="color: #61afef;">RED_PIN</span>, <span style="color: #61afef;">PWM_FREQUENCY</span>) <span style="color: #98c379;"># Initialize PWM on the red pin</span>
+         </pre>
+</div>
+
+<!-- =======================
+          Step 4: Enter the Main Loop
+          ======================= -->
+<h3><strong>4. Enter the Main Loop</strong></h3>
+<p>
+  In the main part of the program, students will enter values to control the red
+  LED's brightness.
+</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #c678dd;">try</span>:
+         <span style="color: #c678dd;">while</span> <span style="color: #d19a66;">True</span>:
+             <span style="color: #61afef;">red_intensity</span> = <span style="color: #98c379;">int</span>(<span style="color: #98c379;">input</span>(<span style="color: #d19a66;">f"Enter a red intensity value (0 to {COLOR_RANGE}): "</span>))
+             <span style="color: #61afef;">duty_cycle</span> = ((<span style="color: #61afef;">COLOR_RANGE</span> - <span style="color: #61afef;">red_intensity</span>) / <span style="color: #61afef;">COLOR_RANGE</span>) * <span style="color: #d19a66;">100</span>
+             <span style="color: #98c379;">print</span>(<span style="color: #d19a66;">f"Red Intensity: {red_intensity} / {COLOR_RANGE}"</span>)
+             <span style="color: #98c379;">print</span>(<span style="color: #d19a66;">f"Inverted Duty Cycle: {duty_cycle:.2f}%"</span>)
+             <span style="color: #98c379;">RED_PWM.start</span>(<span style="color: #61afef;">duty_cycle</span>)
+             <span style="color: #98c379;">print</span>(<span style="color: #d19a66;">"PWM signal running. Press Ctrl+C to stop or input a new intensity value."</span>)
+         </pre>
+</div>
+
+<!-- =======================
+     Step 4: Detailed Explanation
+     ======================= -->
+<h4><strong>Detailed Explanation of duty_cycle Calculation</strong></h4>
+<p>
+  The line
+  <code
+    style="
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 2px 4px;
+      border-radius: 3px;
+    "
+    >duty_cycle = ((COLOR_RANGE - red_intensity) / COLOR_RANGE) * 100</code
+  >
+  adjusts the LED brightness by inverting the intensity value. Here's how it
+  works:
+</p>
+<ul>
+  <li>
+    <code
+      style="
+        background-color: #2e3440;
+        color: #d8dee9;
+        padding: 2px 4px;
+        border-radius: 3px;
+      "
+      >COLOR_RANGE</code
+    >: This is the total number of color values (255), representing the full
+    8-bit range for the color intensity.
+  </li>
+  <li>
+    <code
+      style="
+        background-color: #2e3440;
+        color: #d8dee9;
+        padding: 2px 4px;
+        border-radius: 3px;
+      "
+      >red_intensity</code
+    >: This is the value input by the student, ranging from 0 (off) to 255
+    (fully on).
+  </li>
+</ul>
+<p>
+  In a normal system, the higher the intensity, the more the LED would be on.
+  However, in this setup, we are using a <strong>low-side driver</strong>,
+  meaning the LED is turned on when the pin is low (0V). So, the duty cycle
+  needs to be inverted:
+</p>
+<ul>
+  <li>
+    Higher
+    <code
+      style="
+        background-color: #2e3440;
+        color: #d8dee9;
+        padding: 2px 4px;
+        border-radius: 3px;
+      "
+      >red_intensity</code
+    >
+    (closer to 255) results in a lower duty cycle (more time spent low, LED is
+    brighter).
+  </li>
+  <li>
+    Lower
+    <code
+      style="
+        background-color: #2e3440;
+        color: #d8dee9;
+        padding: 2px 4px;
+        border-radius: 3px;
+      "
+      >red_intensity</code
+    >
+    (closer to 0) results in a higher duty cycle (less time spent low, LED is
+    dimmer).
+  </li>
+</ul>
+<p>
+  The calculation ensures that we adjust the time the pin stays low, controlling
+  the brightness of the LED accordingly.
+</p>
+
+<!-- =======================
+     Step 5: Handle Program Exit
+     ======================= -->
+<h3><strong>5. Handle Program Exit</strong></h3>
+<p>
+  When the user presses <code>Ctrl+C</code>, the program will exit and clean up
+  the GPIO settings.
+</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #c678dd;">except</span> <span style="color: #61afef;">KeyboardInterrupt</span>:
+    <span style="color: #c678dd;">pass</span> <span style="color: #98c379;"># Allow exit with Ctrl+C</span>
+    </pre>
+</div>
+<p>
+  This ensures the program ends gracefully and does not leave any GPIO pins in
+  an undefined state, which could cause issues in future runs.
+</p>
+
+<!-- =======================
+     Step 6: Cleanup GPIO Pins
+     ======================= -->
+<h3><strong>6. Cleanup GPIO</strong></h3>
+<p>Finally, we clean up the GPIO pins to reset them to their default state:</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #98c379;">GPIO.cleanup</span>()
+<span style="color: #98c379;">print</span>(<span style="color: #d19a66;">"End of program, cleaning up..."</span>)
+    </pre>
+</div>
+<p>
+  Calling
+  <code
+    style="
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 2px 4px;
+      border-radius: 3px;
+    "
+    >GPIO.cleanup()</code
+  >
+  resets all the GPIO pins to their initial state. This step is important to
+  avoid issues when running other GPIO programs.
+</p>

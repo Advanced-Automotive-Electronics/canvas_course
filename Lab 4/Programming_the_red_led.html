@@ -1,0 +1,244 @@
+<p><strong>Lab 4: Programming the RGB Module with PWM</strong></p>
+<p>
+  Welcome to Lab 4! In this lab, we&rsquo;ll explore how to use Pulse Width
+  Modulation (PWM) to control the brightness of an LED on the RGB module
+  connected to your Raspberry Pi. We&rsquo;ll focus on the red LED and use GPIO
+  17 with a frequency of 500 Hz. The demo code for this project can be found in
+  the <code>Lab4/demo_code/red_rgb_pwm.py</code> file. By the end of this lab,
+  you'll understand how PWM works and how to implement it in Python.
+</p>
+<p>&nbsp;</p>
+<p>
+  <img
+    src="https://weber.instructure.com/courses/591482/files/114993506/preview"
+    alt="File Location"
+    data-ally-user-updated-alt="File Location"
+    data-api-endpoint="https://weber.instructure.com/api/v1/courses/591482/files/114993506"
+    data-api-returntype="File"
+  />
+</p>
+<hr />
+<h3><strong>Step 1: Setup Reminder</strong></h3>
+<p>
+  Before we begin with the code, make sure that your RGB module is properly
+  connected to your Raspberry Pi. If you haven&rsquo;t set up your RGB module
+  yet, please refer to the previous lesson for detailed setup instructions.
+</p>
+<hr />
+<h3><strong>Step 2: Code Overview</strong></h3>
+<p>
+  In this step, we'll walk through the Python code used to control the red LED
+  on the RGB module. The code is divided into logical sections to make it easy
+  to follow:
+</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #98c379;"># Constants</span>
+<span style="color: #61afef;">RED_PIN</span> = <span style="color: #d19a66;">17</span> <span style="color: #98c379;"># GPIO pin for the red LED</span>
+<span style="color: #61afef;">FREQUENCY</span> = <span style="color: #d19a66;">500</span> <span style="color: #98c379;"># PWM frequency in Hz</span>
+<span style="color: #61afef;">DUTY_CYCLE</span> = <span style="color: #d19a66;">50</span> <span style="color: #98c379;"># Duty cycle in percentage</span>
+    </pre>
+</div>
+<ul>
+  <li>
+    <strong>RED_PIN</strong>: This defines which GPIO pin will control the red
+    LED (in this case, GPIO 17).
+  </li>
+  <li>
+    <strong>FREQUENCY</strong>: Set at 500 Hz to avoid flickering and provide
+    smooth control.
+  </li>
+  <li>
+    <strong>DUTY_CYCLE</strong>: Set at 50%, meaning the LED will be on for half
+    of each cycle, resulting in half brightness.
+  </li>
+</ul>
+<hr />
+<h3><strong>Step 3: GPIO Setup</strong></h3>
+<p>
+  Now, we need to configure the GPIO pins on the Raspberry Pi and initialize the
+  red LED in an off state:
+</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">setmode</span>(<span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">BCM</span>) <span style="color: #98c379;"># Using BCM pin numbering</span>
+<span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">setup</span>(<span style="color: #61afef;">RED_PIN</span>, <span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">OUT</span>) <span style="color: #98c379;"># Set RED_PIN as an output</span>
+<span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">output</span>(<span style="color: #61afef;">RED_PIN</span>, <span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">HIGH</span>) <span style="color: #98c379;"># Initialize with the LED off</span>
+    </pre>
+</div>
+<ul>
+  <li>
+    <strong>BCM Pin Numbering</strong>: We are using the GPIO numbering (BCM)
+    instead of physical pin numbers.
+  </li>
+  <li><strong>Output Mode</strong>: GPIO 17 is set as an output pin.</li>
+  <li>
+    <strong>Turn Off LED</strong>: Initially, we turn the LED off by setting the
+    pin HIGH, as we will use PWM to control when it turns on.
+  </li>
+</ul>
+<hr />
+<h3><strong>Step 4: Creating the PWM Object</strong></h3>
+<p>We create a PWM object for the red LED pin and set the frequency:</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">pwm_red</span> = <span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">PWM</span>(<span style="color: #61afef;">RED_PIN</span>, <span style="color: #61afef;">FREQUENCY</span>) <span style="color: #98c379;"># Set up PWM on RED_PIN with the frequency</span>
+    </pre>
+</div>
+<p>This line initializes PWM on GPIO 17 with a frequency of 500 Hz.</p>
+<hr />
+<h3><strong>Step 5: Starting PWM</strong></h3>
+<p>
+  Now, let's start the PWM signal with a 50% duty cycle, which will light the
+  LED at half brightness:
+</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">pwm_red</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">start</span>(<span style="color: #61afef;">DUTY_CYCLE</span>) <span style="color: #98c379;"># Start PWM with a 50% duty cycle</span>
+    </pre>
+</div>
+<ul>
+  <li>
+    <strong>50% Duty Cycle</strong>: The LED will be on for half the time,
+    providing half brightness.
+  </li>
+</ul>
+<hr />
+<h3><strong>Step 6: Monitoring the Program</strong></h3>
+<p>
+  The program runs in an infinite loop until you stop it using
+  <code>Ctrl + C</code>. Here's the code for that:
+</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #c678dd;">try</span>:
+    <span style="color: #c678dd;">while</span> <span style="color: #61afef;">True</span>:
+        <span style="color: #61afef;">time</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">sleep</span>(<span style="color: #d19a66;">1</span>) <span style="color: #98c379;"># Keep the PWM running</span>
+<span style="color: #c678dd;">except</span> <span style="color: #61afef;">KeyboardInterrupt</span>:
+    <span style="color: #61afef;">pwm_red</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">stop</span>() <span style="color: #98c379;"># Stop PWM on exit</span>
+    <span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">cleanup</span>() <span style="color: #98c379;"># Clean up GPIO settings</span>
+    </pre>
+</div>
+<ul>
+  <li>
+    <strong>Infinite Loop</strong>: The PWM signal runs continuously until
+    interrupted.
+  </li>
+  <li>
+    <strong>Graceful Exit</strong>: Upon exiting, the program stops the PWM and
+    resets the GPIO pins to avoid any issues.
+  </li>
+</ul>
+<hr />
+<h3><strong>Step 7: GPIO Cleanup</strong></h3>
+<p>
+  Once the program is complete or interrupted, we clean up the GPIO resources:
+</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">cleanup</span>()
+    </pre>
+</div>
+<p>
+  This command resets all GPIO pins to their default state, ensuring no
+  interference with future programs.
+</p>
+<hr />
+<h3><strong>Step 8: Running the Code in VS Code</strong></h3>
+<p>
+  Now that we&rsquo;ve gone through the code, it&rsquo;s time to see it in
+  action. Open up VS Code and navigate to the
+  <code>Lab4/demo_code/red_rgb_pwm.py</code> file. Once you&rsquo;ve opened the
+  file, click the 'Run' button. You should see the red LED on your RGB module
+  light up at half brightness. The program will continue running until you
+  manually stop it.
+</p>
+<hr />
+<h3><strong>Full Code</strong></h3>
+<p>
+  Below is the complete code for this lab, implementing PWM to control the red
+  LED on the RGB module:
+</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #c678dd;">import</span> <span style="color: #98c379;">RPi.GPIO</span> <span style="color: #c678dd;">as</span> <span style="color: #98c379;">GPIO</span>
+<span style="color: #c678dd;">import</span> <span style="color: #61afef;">time</span>
+
+<span style="color: #98c379;"># Constants</span>
+<span style="color: #61afef;">RED_PIN</span> = <span style="color: #d19a66;">17</span> <span style="color: #98c379;"># GPIO pin for the red LED</span>
+<span style="color: #61afef;">FREQUENCY</span> = <span style="color: #d19a66;">500</span> <span style="color: #98c379;"># PWM frequency in Hz</span>
+<span style="color: #61afef;">DUTY_CYCLE</span> = <span style="color: #d19a66;">50</span> <span style="color: #98c379;"># Duty cycle in percentage</span>
+
+<span style="color: #98c379;"># GPIO setup</span>
+<span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">setmode</span>(<span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">BCM</span>) <span style="color: #98c379;"># Using BCM pin numbering</span>
+<span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">setup</span>(<span style="color: #61afef;">RED_PIN</span>, <span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">OUT</span>) <span style="color: #98c379;"># Set RED_PIN as an output</span>
+<span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">output</span>(<span style="color: #61afef;">RED_PIN</span>, <span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">HIGH</span>) <span style="color: #98c379;"># Initialize with the LED off</span>
+
+<span style="color: #98c379;"># Create PWM object</span>
+<span style="color: #61afef;">pwm_red</span> = <span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">PWM</span>(<span style="color: #61afef;">RED_PIN</span>, <span style="color: #61afef;">FREQUENCY</span>) <span style="color: #98c379;"># Set up PWM on RED_PIN with the frequency</span>
+<span style="color: #61afef;">pwm_red</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">start</span>(<span style="color: #61afef;">DUTY_CYCLE</span>) <span style="color: #98c379;"># Start PWM with a 50% duty cycle</span>
+
+<span style="color: #c678dd;">try</span>:
+    <span style="color: #c678dd;">while</span> <span style="color: #61afef;">True</span>:
+        <span style="color: #61afef;">time</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">sleep</span>(<span style="color: #d19a66;">1</span>) <span style="color: #98c379;"># Keep the PWM running</span>
+
+<span style="color: #c678dd;">except</span> <span style="color: #61afef;">KeyboardInterrupt</span>:
+    <span style="color: #61afef;">pwm_red</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">stop</span>() <span style="color: #98c379;"># Stop PWM on exit</span>
+    <span style="color: #98c379;">GPIO</span><span style="color: #ffffff;">.</span><span style="color: #d19a66;">cleanup</span>() <span style="color: #98c379;"># Clean up GPIO settings</span>
+    </pre>
+</div>
+<p>
+  This code sets up PWM on the Raspberry Pi to control the red LED with a 50%
+  duty cycle and 500 Hz frequency. Use <strong>Ctrl + C</strong> to stop the
+  program, and remember to clean up the GPIO settings after execution to avoid
+  any issues in future programs.
+</p>
