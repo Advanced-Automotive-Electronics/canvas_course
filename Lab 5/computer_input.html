@@ -1,0 +1,102 @@
+<h3><strong>How Computers Process Inputs and Understanding Floating Pins</strong></h3>
+<hr />
+<h3><strong>Introduction:</strong></h3>
+<p>In this lab, we will explore how a computer, such as a Raspberry Pi, processes inputs. Inputs allow computers to interact with the physical world, receiving signals from buttons, sensors, and other devices.</p>
+<hr />
+<h3><strong>Binary Signals in Computers:</strong></h3>
+<p>Computers operate using <strong>binary signals</strong>&mdash;everything is represented as either a <code>1</code> or a <code>0</code>. These binary states correspond to:</p>
+<ul>
+    <li><strong>High (1)</strong>: A high signal often indicates that a certain voltage (typically 3.3V or 5V) is present at the input pin.</li>
+    <li><strong>Low (0)</strong>: A low signal means no voltage, or a very low voltage, is present (typically 0V).</li>
+</ul>
+<p>When you press a button or activate a sensor, the Raspberry Pi's <strong>GPIO (General Purpose Input/Output)</strong> pins detect these high and low states. Based on the input, the computer can take actions, such as turning on an LED or triggering another function.</p>
+<hr />
+<h3><strong>GPIO Pins:</strong></h3>
+<p>The <strong>GPIO pins</strong> on a Raspberry Pi allow it to read the state of external devices. When the pin detects a voltage (<code>high</code>) or no voltage (<code>low</code>), the computer processes this information as <code>1</code> or <code>0</code> in binary form.</p>
+<hr />
+<h3><strong>The Problem: Floating Pins</strong></h3>
+<p>Sometimes, an input pin isn't connected to a stable voltage. This condition is called a <strong>floating pin</strong>. A floating pin fluctuates unpredictably between high and low states due to electrical noise. This is problematic because the computer is unable to reliably determine the input state.</p>
+<ul>
+    <li><strong>Floating Pin Behavior</strong>: If a pin is left floating (unconnected to a voltage or ground), the Raspberry Pi may read the pin as high one moment and low the next, even though no signal is being sent.</li>
+</ul>
+<p><strong>Why is this a problem?</strong> A floating pin makes your input readings unreliable and may cause the system to behave unpredictably.</p>
+<hr />
+<h3><strong>Demonstration: Floating Pin in Action</strong></h3>
+<p>We will now demonstrate the behavior of a floating pin using the following Python code. The code can be found in Lab5/demo_code/floating_input&nbsp;</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+    <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;"><span style="color: #61afef;">#!/usr/bin/env python</span>
+<span style="color: #61afef;">import</span> <span style="color: #c678dd;">RPi.GPIO</span> <span style="color: #61afef;">as</span> <span style="color: #c678dd;">GPIO</span>
+<span style="color: #61afef;">import</span> <span style="color: #c678dd;">time</span>
+
+<span style="color: #98c379;"># Define input pin</span>
+<span style="color: #e8fd00;">inputPin</span> = <span style="color: #d19a66;">17</span> <span style="color: #98c379;"># Using BCM pin 17</span>
+
+<span style="color: #61afef;">def</span> <span style="color: #c678dd;">setup</span>():
+    <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setmode</span>(<span style="color: #c678dd;">GPIO.BCM</span>) <span style="color: #98c379;"># Use BCM pin numbering</span>
+    <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">inputPin</span>, <span style="color: #c678dd;">GPIO.IN</span>) <span style="color: #98c379;"># Set input pin with no pull-up or pull-down resistor</span>
+
+<span style="color: #e8fd00;">setup</span>()
+<span style="color: #61afef;">while</span> <span style="color: #d19a66;">True</span>:
+    <span style="color: #61afef;">try</span>:
+        <span style="color: #e8fd00;">pinState</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">input</span>(<span style="color: #e8fd00;">inputPin</span>) <span style="color: #98c379;"># Read the floating input pin</span>
+        <span style="color: #61afef;">if</span> <span style="color: #e8fd00;">pinState</span> == <span style="color: #d19a66;">True</span>:
+            <span style="color: #c678dd;">print</span>(<span style="color: #98c379;">'Pin is HIGH (floating)'</span>)
+        <span style="color: #61afef;">else</span>:
+            <span style="color: #c678dd;">print</span>(<span style="color: #98c379;">'Pin is LOW (floating)'</span>)
+        <span style="color: #c678dd;">time</span>.<span style="color: #61afef;">sleep</span>(<span style="color: #d19a66;">1</span>) <span style="color: #98c379;"># Read the pin every second</span>
+    <span style="color: #61afef;">except</span> KeyboardInterrupt:
+        <span style="color: #61afef;">break</span>
+
+<span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">cleanup</span>() <span style="color: #98c379;"># Clean up GPIO on exit</span>
+    </pre>
+</div>
+<h4><strong>Run this code on your Raspberry Pi:</strong></h4>
+<ol>
+    <li>The pin used for input will be left unconnected&mdash;this means the pin is floating.</li>
+    <li>You will see unpredictable results, where the input pin randomly switches between high and low states, despite no external input.</li>
+</ol>
+<h3><strong>Instructions for Connecting the Scope Leads:</strong></h3>
+<ol>
+    <li>
+        <p><strong>Connect Jumper Wires:</strong></p>
+        <ul>
+            <li>Attach one jumper wire to <strong>GPIO 17</strong> (BCM pin 17), which corresponds to <strong>physical pin 11</strong> on the Raspberry Pi.</li>
+            <li>Attach another jumper wire to <strong>ground</strong> at <strong>physical pin 39</strong> on the Raspberry Pi.</li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>Connect the PicoScope Probes:</strong></p>
+        <ul>
+            <li>Connect the <strong>positive (signal) probe</strong> of the PicoScope to the jumper wire connected to <strong>GPIO 17</strong> (physical pin 11).</li>
+            <li>Connect the <strong>ground clip</strong> of the PicoScope to the jumper wire connected to <strong>ground</strong> at <strong>physical pin 39</strong>.</li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>Start Measuring:</strong></p>
+        <ul>
+            <li>Once the connections are secure, run your floating input code on the Raspberry Pi.</li>
+            <li>Observe the signal on the PicoScope, which will display the erratic voltage fluctuations caused by the floating input.</li>
+        </ul>
+    </li>
+</ol>
+<p><img src="https://weber.instructure.com/courses/591482/files/115075728/preview" alt="IMG_0101.jpg" data-api-endpoint="https://weber.instructure.com/api/v1/courses/591482/files/115075728" data-api-returntype="File" /></p>
+<h4><strong>Explanation:</strong></h4>
+<p>This behavior occurs because the floating pin picks up electrical noise from its surroundings, making it impossible for the computer to accurately determine its state.</p>
+<p>The scope pattern shows erratic fluctuations between high and low voltages, which occur because the input pin is floating. In this state, the pin is not connected to a defined voltage, making it highly sensitive to environmental electrical noise. This results in unpredictable, noisy readings, which is why handling floating inputs is essential in circuits that require reliable input signals.</p>
+<h4><strong>Measuring Floating Pin:</strong></h4>
+<p>Now that we&rsquo;ve explained the code, let&rsquo;s take a look at the actual behavior of a floating pin using the Picoscope. Below, you&rsquo;ll find a scope pattern captured from the floating input pin, showing how the signal behaves when left unconnected.</p>
+<p><img src="https://weber.instructure.com/courses/591482/files/115075667/preview" alt="floating_pin-1.png" data-api-endpoint="https://weber.instructure.com/api/v1/courses/591482/files/115075667" data-api-returntype="File" /></p>
+<hr />
+<h3><strong>The Solution: Stabilizing the Pin</strong></h3>
+<p>In the next lab, we will introduce a solution to the floating pin issue using <strong>pull-up</strong> or <strong>pull-down resistors</strong>. These resistors ensure that when the input isn&rsquo;t actively connected, it defaults to a known state (high or low), providing reliable input signals.</p>
+<p>&nbsp;</p>
+<hr />
+<h3><strong>Conclusion:</strong></h3>
+<p>Understanding how a computer processes inputs and the importance of handling floating pins is crucial for designing reliable systems. In this lab, we explored how the Raspberry Pi reads binary signals and saw firsthand the unpredictable behavior of floating pins. Stay tuned for the next lab, where we&rsquo;ll address this issue using pull-up and pull-down resistors.</p>
+<hr />
+<h3><strong>Assignment:</strong></h3>
+<ul>
+    <li>Take a clear photo of your PicoScope display measuring the floating pin.</li>
+    <li>Ensure that both the PicoScope screen and your wiring setup are visible in the photo.</li>
+    <li>Submit the photo as part of this assignment.</li>
+</ul>
