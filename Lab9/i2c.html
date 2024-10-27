@@ -1,0 +1,304 @@
+<h2>Introduction to I2C Communication</h2>
+<h3>Pronunciation</h3>
+<p>
+  The term <strong>I2C</strong> is pronounced as "<strong>I-squared-C</strong>"
+  and stands for <strong>Inter-Integrated Circuit</strong>. It is a
+  communication protocol commonly used in electronics to allow microcontrollers
+  and peripherals to communicate with each other. Sometimes, it&rsquo;s also
+  referred to as "<strong>I-two-C</strong>."
+</p>
+<h3>What is I2C?</h3>
+<p>
+  <iframe
+    title="YouTube video player"
+    src="https://www.youtube.com/embed/6IAkYpmA1DQ?si=vS4cLxHBfeGlSDoW"
+    width="560"
+    height="315"
+    allowfullscreen="allowfullscreen"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  ></iframe>
+</p>
+<p>
+  I2C is a serial communication protocol that allows multiple devices to
+  communicate over just two shared data lines:
+</p>
+<ul>
+  <li>
+    <strong>SDA (Serial Data Line)</strong>: Used to transfer data between
+    devices.
+  </li>
+  <li>
+    <strong>SCL (Serial Clock Line)</strong>: Used to synchronize the data
+    transfer.
+  </li>
+</ul>
+<p>
+  What makes I2C unique is its ability to connect multiple devices (both masters
+  and slaves) to the same bus, each with its own unique address, and it works
+  with fewer connections compared to other communication protocols like SPI.
+</p>
+<hr />
+<h3>Drawing Parallels Between I2C and CAN Bus</h3>
+<p>
+  Since many of you are already familiar with <strong>CAN Bus</strong>, we can
+  draw some parallels to help you understand I2C better:
+</p>
+<h4>1. <strong>Multi-Device Communication</strong></h4>
+<ul>
+  <li>
+    <strong>I2C</strong>: Allows multiple devices (both master and slave
+    devices) to share the same bus, with each device having a unique address.
+    The master initiates communication and controls the clock signal.
+  </li>
+  <li>
+    <strong>CAN Bus</strong>: Also allows multiple devices to communicate over a
+    shared bus. However, in CAN, all nodes are "peers," meaning any device can
+    initiate communication.
+  </li>
+</ul>
+<h4>2. <strong>Wiring</strong></h4>
+<ul>
+  <li>
+    <strong>I2C</strong>: Requires just two wires, <strong>SDA</strong> and
+    <strong>SCL</strong>, to transfer data and synchronize communication. Both
+    lines are pulled high by resistors and shared across all devices.
+  </li>
+  <li>
+    <strong>CAN Bus</strong>: Uses two wires, <strong>CAN High</strong> and
+    <strong>CAN Low</strong>, for differential signaling, which helps reduce
+    noise and ensures robust communication over longer distances.
+  </li>
+</ul>
+<h4>3. <strong>Data Speeds and Length</strong></h4>
+<ul>
+  <li>
+    <strong>I2C</strong>: Typically used for short distances (e.g.,
+    communication within a single device or between devices on a circuit board).
+    It operates at speeds of up to 400 kHz in standard mode or up to 3.4 MHz in
+    high-speed mode.
+  </li>
+  <li>
+    <strong>CAN Bus</strong>: Designed for communication over longer distances,
+    such as between different control units in a vehicle. CAN Bus typically
+    operates at up to 1 Mbps, but newer standards like CAN FD allow higher data
+    rates.
+  </li>
+</ul>
+<h4>4. <strong>Error Detection</strong></h4>
+<ul>
+  <li>
+    <strong>I2C</strong>: Has basic error detection through the use of
+    acknowledgment bits. The receiving device sends an acknowledgment bit back
+    to the sender to confirm successful data reception. However, it lacks
+    advanced error-handling mechanisms.
+  </li>
+  <li>
+    <strong>CAN Bus</strong>: More robust when it comes to error detection. It
+    uses mechanisms like CRC checks, bit stuffing, and error counters to ensure
+    data integrity.
+  </li>
+</ul>
+<h4>5. <strong>Master-Slave vs Peer-to-Peer</strong></h4>
+<ul>
+  <li>
+    <strong>I2C</strong>: Operates on a <strong>master-slave</strong> model,
+    where the master controls the communication and initiates contact with slave
+    devices.
+  </li>
+  <li>
+    <strong>CAN Bus</strong>: Operates in a <strong>peer-to-peer</strong> model,
+    meaning any device on the bus can initiate communication, and arbitration is
+    used to resolve conflicts.
+  </li>
+</ul>
+<h4>6. <strong>Addressing</strong></h4>
+<ul>
+  <li>
+    <strong>I2C</strong>: Each device has a unique 7- or 10-bit address assigned
+    to it. The master addresses the slave device by its address when it wants to
+    communicate.
+  </li>
+  <li>
+    <strong>CAN Bus</strong>: CAN does not use addresses in the same way.
+    Instead, it uses message identifiers (IDs) to label the type of data being
+    transmitted, and all nodes can listen for messages relevant to them.
+  </li>
+</ul>
+<h4>Summary of Parallels:</h4>
+<p>
+  While both I2C and CAN Bus allow communication between multiple devices using
+  only a few wires, I2C is more suited for short-distance, low-power
+  communication inside devices or systems, while CAN Bus is designed for robust,
+  long-distance communication in environments like vehicles.
+</p>
+<hr />
+<h3>I2C on the Raspberry Pi</h3>
+<p>
+  The Raspberry Pi supports I2C communication, which makes it ideal for
+  interfacing with a wide range of sensors, displays, and other peripherals.
+</p>
+<p>On the Raspberry Pi, I2C is enabled using the following pins:</p>
+<ul>
+  <li>
+    <strong>SDA (Physical Pin 3)</strong>: The data line for communication.
+  </li>
+  <li>
+    <strong>SCL (Physical Pin 5)</strong>: The clock line for synchronization.
+  </li>
+</ul>
+<p>
+  These pins correspond to <strong>GPIO 2 (SDA)</strong> and
+  <strong>GPIO 3 (SCL)</strong>. The I2C protocol allows the Raspberry Pi to
+  communicate with devices like the PCF8591 module used in this lab.
+</p>
+<h3>Enabling I2C on the Raspberry Pi</h3>
+<p>To enable I2C on your Raspberry Pi, follow these steps:</p>
+<ol>
+  <li>Open a terminal on your Raspberry Pi.</li>
+  <li>
+    Run <code>sudo raspi-config</code> to open the Raspberry Pi configuration
+    tool.
+  </li>
+  <li>
+    Navigate to <code>Interface Options</code> and select <code>I2C</code>.
+  </li>
+  <li>Choose to enable the I2C interface.</li>
+  <li>Reboot the Raspberry Pi to apply the changes.</li>
+</ol>
+<h3>I2C Addresses</h3>
+<p>
+  Each device connected to the I2C bus has a unique address. To find the address
+  of a connected device, you can use the <code>i2cdetect</code> command:
+</p>
+<ol>
+  <ol>
+    <li>
+      Install the I2C tools if they aren&rsquo;t already installed by running:
+    </li>
+  </ol>
+</ol>
+<div
+  class="contain-inline-size rounded-md border-[0.5px] border-token-border-medium relative bg-token-sidebar-surface-primary dark:bg-gray-950"
+>
+  <div class="overflow-y-auto p-4" dir="ltr">
+    <code class="!whitespace-pre hljs language-bash"
+      >sudo apt install i2c-tools</code
+    >
+  </div>
+</div>
+<ol>
+  <ol>
+    <li>Run the following command to scan for I2C devices:</li>
+  </ol>
+</ol>
+<div
+  class="contain-inline-size rounded-md border-[0.5px] border-token-border-medium relative bg-token-sidebar-surface-primary dark:bg-gray-950"
+>
+  <div class="overflow-y-auto p-4" dir="ltr">
+    <code class="!whitespace-pre hljs language-bash">sudo i2cdetect -y 1</code>
+  </div>
+</div>
+<p>
+  This will display a grid of addresses, showing the address of any connected
+  I2C devices.
+</p>
+<p>&nbsp;</p>
+<p>
+  <img
+    src="https://weber.instructure.com/courses/591482/files/115157166/preview"
+    alt="i2c lookup-1.png"
+    data-api-endpoint="https://weber.instructure.com/api/v1/courses/591482/files/115157166"
+    data-api-returntype="File"
+  /><span
+    class="mceNonEditable"
+    style="display: inline-flex"
+    aria-label="Loading placeholder for i2c lookup.png"
+    data-placeholder-for="i2c%20lookup.png"
+  >
+    <img
+      style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%"
+      aria-hidden="true"
+    />
+  </span>
+</p>
+<div
+  style="
+    color: #2d3b45;
+    z-index: 1000;
+    display: inline-block;
+    max-width: calc(100% - 10px);
+    overflow: hidden;
+    white-space: nowrap;
+  "
+>
+  i2c lookup.png
+</div>
+<p>
+  <span
+    id="placeholder-0"
+    class="mceNonEditable"
+    style="display: inline-flex"
+    aria-label="Loading placeholder for i2c lookup.png"
+    data-placeholder-for="i2c%20lookup.png"
+  ></span>
+</p>
+<p>
+  <span
+    id="placeholder-0"
+    class="mceNonEditable"
+    style="display: inline-flex"
+    aria-label="Loading placeholder for i2c lookup.png"
+    data-placeholder-for="i2c%20lookup.png"
+  ></span>
+</p>
+<h3>Advantages of I2C</h3>
+<ul>
+  <li>
+    <strong>Simple Wiring</strong>: Only two lines (SDA and SCL) are needed for
+    communication between multiple devices.
+  </li>
+  <li>
+    <strong>Multiple Devices</strong>: The Raspberry Pi can communicate with
+    several peripherals on the same bus, each identified by its unique address.
+  </li>
+  <li>
+    <strong>Low Power</strong>: I2C is power-efficient, making it ideal for
+    battery-powered projects.
+  </li>
+</ul>
+<h3>Use in Lab 9</h3>
+<p>
+  In Lab 9, we will be using I2C to communicate with the
+  <strong>PCF8591 module</strong>. This module allows us to interact with both
+  analog and digital signals using I2C, which will be critical for controlling
+  and reading data from various components, such as the dual-color LED module.
+</p>
+<h3>Additional Resources</h3>
+<p>
+  <iframe
+    title="YouTube video player"
+    src="https://www.youtube.com/embed/CAvawEcxoPU?si=vA0ofBN7a8jFCAdN"
+    width="560"
+    height="315"
+    allowfullscreen="allowfullscreen"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  ></iframe>
+</p>
+<p>
+  <iframe
+    title="YouTube video player"
+    src="https://www.youtube.com/embed/PnG4fO5_vU4?si=l7am01OyCzJR5tMI"
+    width="560"
+    height="315"
+    allowfullscreen="allowfullscreen"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  ></iframe>
+  <iframe
+    title="YouTube video player"
+    src="https://www.youtube.com/embed/yBgikWNoU9o?si=ZRrGqYaUSlNeC78Q"
+    width="560"
+    height="315"
+    allowfullscreen="allowfullscreen"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  ></iframe>
+</p>

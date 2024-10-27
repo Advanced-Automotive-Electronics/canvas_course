@@ -299,7 +299,262 @@ PCF8591_ADDRESS = <span style="color: #d19a66;">0x48</span>
     loop()   <span style="color: #56b6c2;"># Start the main loop</span>
     </pre>
 </div>
-<h5><strong>Step 4: Test the Circuit</strong></h5>
+<h5><strong>Step 4: Line-by-Line Explanation of the Code</strong></h5>
+<p>
+  The following section provides an explanation of each part of the code located
+  at <strong>Lab9/demo_code/pcf8591_led_control.py</strong>:
+</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">#!/usr/bin/env python3</span>
+    </pre>
+</div>
+<p>
+  This line is a shebang that tells the operating system to use Python 3 to
+  execute the script.
+</p>
+<hr />
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">import</span> PCF8591 <span style="color: #61afef;">as</span> ADC
+<span style="color: #61afef;">import</span> time
+    </pre>
+</div>
+<p>These lines import necessary modules:</p>
+<ul>
+  <li>
+    <strong>PCF8591:</strong> This module handles the communication with the
+    PCF8591 ADC/DAC chip.
+  </li>
+  <li>
+    <strong>time:</strong> This module is used to add delays in the code (for
+    instance, to avoid using excessive CPU).
+  </li>
+</ul>
+<hr />
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  >PCF8591_ADDRESS = <span style="color: #d19a66;">0x48</span>
+    </pre>
+</div>
+<p>
+  This line sets the I2C address of the PCF8591 device. The address
+  <code>0x48</code> is the default I2C address for the module and must match the
+  physical setup.
+</p>
+<hr />
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">def</span> setup():
+    ADC.setup(PCF8591_ADDRESS)
+    <span style="color: #61afef;">print</span>(<span style="color: #98c379;">"PCF8591 initialized"</span>)
+    </pre>
+</div>
+<p>
+  The <code>setup()</code> function initializes the PCF8591 module for
+  communication using the specified I2C address. The
+  <code>ADC.setup()</code> function is responsible for configuring the device to
+  communicate over the I2C bus, and <code>print()</code> is used to confirm
+  initialization in the console.
+</p>
+<hr />
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">def</span> read_analog_input():
+    <span style="color: #61afef;">return</span> ADC.read(<span style="color: #d19a66;">0</span>)
+    </pre>
+</div>
+<p>
+  This function reads the analog input from the <strong>AIN0</strong> pin of the
+  PCF8591 module. The <code>ADC.read(0)</code> function returns an 8-bit value
+  (between 0 and 255) representing the analog voltage input on
+  <strong>AIN0</strong>. The function returns this value to be used elsewhere in
+  the code.
+</p>
+<hr />
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">def</span> write_analog_output(value):
+    ADC.write(value)
+    </pre>
+</div>
+<p>
+  This function sends the value passed to it as a parameter to the
+  <strong>AOUT</strong> pin of the PCF8591 module. This value is written as an
+  8-bit digital signal and is converted back into an analog signal to control
+  the brightness of the LED.
+</p>
+<hr />
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">def</span> loop():
+    <span style="color: #61afef;">try</span>:
+        <span style="color: #61afef;">while</span> <span style="color: #e8fd00;">True</span>:
+            analog_value = read_analog_input()  <span style="color: #56b6c2;"># Read from AIN0</span>
+            <span style="color: #61afef;">print</span>(f<span style="color: #98c379;">"Analog input value: {analog_value}"</span>)  <span style="color: #56b6c2;"># Print the input value</span>
+            
+            write_analog_output(analog_value)  <span style="color: #56b6c2;"># Write the value to AOUT</span>
+            time.sleep(<span style="color: #d19a66;">0.1</span>)  <span style="color: #56b6c2;"># Wait for 100 milliseconds</span>
+    <span style="color: #61afef;">except</span> KeyboardInterrupt:
+        destroy()
+    </pre>
+</div>
+<p>
+  The <code>loop()</code> function runs continuously and handles reading and
+  writing values in an infinite loop:
+</p>
+<ul>
+  <li>
+    <code>analog_value = read_analog_input()</code>: Reads the current value
+    from the <strong>AIN0</strong> pin using the
+    <code>read_analog_input()</code> function.
+  </li>
+  <li>
+    <code>print(f"Analog input value: {analog_value}")</code>: Outputs the value
+    read from AIN0 to the terminal, so you can see what value is being
+    processed.
+  </li>
+  <li>
+    <code>write_analog_output(analog_value)</code>: Sends the value read from
+    AIN0 to the <strong>AOUT</strong> pin using the
+    <code>write_analog_output()</code> function, which will control the
+    brightness of the LED.
+  </li>
+  <li>
+    <code>time.sleep(0.1)</code>: Pauses the program for 100 milliseconds to
+    reduce CPU usage and slow the loop slightly.
+  </li>
+  <li>
+    <code>except KeyboardInterrupt:</code> This handles the event when the user
+    presses <kbd>Ctrl + C</kbd> to stop the program and calls the
+    <code>destroy()</code> function to clean up before exiting.
+  </li>
+</ul>
+<hr />
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">def</span> destroy():
+    <span style="color: #61afef;">print</span>(<span style="color: #98c379;">"Exiting..."</span>)
+    ADC.write(<span style="color: #d19a66;">0</span>)  <span style="color: #56b6c2;"># Turn off output</span>
+    <span style="color: #61afef;">print</span>(<span style="color: #98c379;">"Analog output turned off"</span>)
+    </pre>
+</div>
+<p>
+  The <code>destroy()</code> function is called when the user interrupts the
+  program (by pressing <kbd>Ctrl + C</kbd>). It turns off the analog output by
+  writing a value of <code>0</code> to the <strong>AOUT</strong> pin and prints
+  messages to the console to confirm the shutdown.
+</p>
+<hr />
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">if</span> __name__ == <span style="color: #98c379;">"__main__"</span>:
+    setup()  <span style="color: #56b6c2;"># Initialize PCF8591</span>
+    loop()   <span style="color: #56b6c2;"># Start the main loop</span>
+    </pre>
+</div>
+<p>
+  This block is the entry point of the program. If the script is run directly,
+  the <code>setup()</code> function is called to initialize the PCF8591, and
+  then the <code>loop()</code> function runs indefinitely to handle the input
+  and output.
+</p>
+<hr />
+<h3><strong>Understanding the Potentiometer on the PCF8591 Module</strong></h3>
+<p>
+  The <strong>potentiometer</strong> on the PCF8591 module is a small,
+  adjustable knob that acts as a variable resistor. By turning this knob, you
+  can change the resistance, which in turn changes the analog input signal sent
+  to the module.
+</p>
+<ul>
+  <li>
+    <strong>Location:</strong> The potentiometer is typically located on the
+    surface of the PCF8591 module. It looks like a small dial or screw head that
+    can be turned clockwise or counterclockwise.
+  </li>
+  <li>
+    <strong>Function:</strong> As you turn the potentiometer, it adjusts the
+    voltage being sent to the module&rsquo;s analog input pin. This change in
+    voltage is read by the PCF8591 and is then converted into a digital value
+    ranging from 0 to 255.
+  </li>
+  <li>
+    <strong>Behavior in this Lab:</strong> When the potentiometer is adjusted,
+    the brightness of the dual-color LED will change accordingly. Turning the
+    potentiometer one way increases the brightness (higher voltage), while
+    turning it the other way decreases the brightness (lower voltage).
+  </li>
+</ul>
+<p><img src="/courses/591482/files/115157286/preview" alt="pot.png" /></p>
+<p>
+  Make sure you identify the potentiometer on your PCF8591 module and adjust it
+  during your video demonstration to show how it affects the LED's brightness.
+</p>
+<h5><strong>Step 5: Test the Circuit</strong></h5>
 <ul>
   <li>
     Run the code on your Raspberry Pi and observe the behavior of the dual-color
@@ -383,13 +638,84 @@ PCF8591_ADDRESS = <span style="color: #d19a66;">0x48</span>
     </p>
   </li>
 </ul>
-<h4><strong>Conclusion</strong></h4>
+<h3>
+  <strong>Assignment: Video Demonstration of Potentiometer Control</strong>
+</h3>
+<h4><strong>Objective:</strong></h4>
 <p>
-  By completing this lab, you will gain hands-on experience with the PCF8591
-  module, analog-to-digital and digital-to-analog conversions, and the I2C
-  communication protocol. This knowledge is essential for integrating analog
-  sensors and devices into larger projects, such as automotive electronics
-  systems. Additionally, this lab highlights how the Raspberry Pi alone lacks
-  the ability to handle analog input and output, making modules like the PCF8591
-  vital for working with real-world signals.
+  In this assignment, you will demonstrate how to control the brightness of the
+  dual-color LED using the potentiometer on the PCF8591 module. You will record
+  a video of your setup, showing the code running and how the brightness of the
+  LED changes as you turn the potentiometer.
 </p>
+<h4><strong>Steps:</strong></h4>
+<ol>
+  <li>
+    <p><strong>Complete the Circuit:</strong></p>
+    <ul>
+      <li>
+        Ensure the dual-color LED is connected correctly to the
+        <strong>AOUT</strong> pin of the PCF8591 module.
+      </li>
+      <li>
+        Connect the potentiometer to the PCF8591 module, ensuring all
+        connections follow the lab instructions.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Run the Code:</strong></p>
+    <ul>
+      <li>
+        Upload and run the Python script that controls the LED brightness based
+        on the potentiometer input. The output should display a value between 0
+        and 255 on the screen as you adjust the potentiometer.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Record Your Demonstration:</strong></p>
+    <ul>
+      <li>
+        Start a video recording showing the following:
+        <ul>
+          <li>
+            <strong>Your Circuit Setup</strong>: A brief overview of how the
+            components (PCF8591, potentiometer, and LED) are connected.
+          </li>
+          <li>
+            <strong>Code Running</strong>: Show your code running in the
+            terminal. As the code runs, ensure that the values between 0 and 255
+            are printed to the screen.
+          </li>
+          <li>
+            <strong>Potentiometer Adjustment</strong>: Turn the potentiometer
+            knob and demonstrate how the brightness of the LED changes
+            accordingly. Make sure the video clearly shows the LED getting
+            brighter or dimmer as the potentiometer is turned.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Submit Your Video:</strong></p>
+    <ul>
+      <li>
+        Upload the video to the assignment submission portal. Ensure the video
+        clearly shows:
+        <ul>
+          <li><strong>Your circuit</strong> and connections.</li>
+          <li>
+            <strong>Your Python code running</strong> and printing values
+            between 0 and 255.
+          </li>
+          <li>
+            <strong>The LED responding</strong> to changes in the
+            potentiometer's position.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>
