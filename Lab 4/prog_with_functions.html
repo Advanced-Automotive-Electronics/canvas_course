@@ -1,0 +1,149 @@
+<!-- =======================
+     Step-by-Step Guide Header
+     ======================= -->
+     <h2>
+        <strong>Step-by-Step Guide: Introducing a Function to Calculate Duty Cycle</strong>
+      </h2>
+      <p>
+        In this guide, we will extend the previous RGB LED control example by introducing a function that simplifies the calculation of the duty cycle. Using a function helps to organize and reuse code, making it more readable and efficient.
+      </p>
+      
+      <!-- =======================
+           Highlighting the Function
+           ======================= -->
+      <h3><strong>1. Creating a Function for Duty Cycle Calculation</strong></h3>
+      <p>
+        The key addition in this code is a function called <code>calculate_duty_cycle()</code>, which simplifies the calculation of the duty cycle for each LED. By passing the color value (an 8-bit number between 0 and 255) to this function, it calculates and returns the correct duty cycle.
+      </p>
+      <div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+        <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+      <span style="color: #61afef;">def</span> <span style="color: #c678dd;">calculate_duty_cycle</span>(color_value):
+          <span style="color: #98c379;"># Perform the calculation and return the result</span>
+          <span style="color: #61afef;">return</span> 100 - ((color_value / 255) * 100)
+        </pre>
+      </div>
+      <ul>
+        <li>
+          <code>color_value</code>: The input to the function, representing the 8-bit color intensity (0-255).
+        </li>
+        <li>
+          <strong>Calculation:</strong> The function calculates the duty cycle by converting the color value to a percentage, then subtracting that from 100 to invert the brightness (since we are using a low-side driver).
+        </li>
+        <li>
+          <strong>Return Value:</strong> The function returns the calculated duty cycle, which is then used to control the brightness of each LED.
+        </li>
+      </ul>
+      
+      <!-- =======================
+           Using the Function
+           ======================= -->
+      <h3><strong>2. Using the Function to Simplify the Code</strong></h3>
+      <p>
+        Now that the function <code>calculate_duty_cycle()</code> has been created, we can call it for each of the RGB values (red, green, and blue) to calculate the appropriate duty cycle.
+      </p>
+      <div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+        <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+      <span style="color: #98c379;"># RGB values as 8-bit values (0-255 range)</span>
+      red_value = <span style="color: #d19a66;">127</span>
+      green_value = <span style="color: #d19a66;">64</span>
+      blue_value = <span style="color: #d19a66;">191</span>
+      
+      <span style="color: #98c379;"># Calculate the duty cycles using the function</span>
+      red_duty_cycle = <span style="color: #61afef;">calculate_duty_cycle</span>(red_value)
+      green_duty_cycle = <span style="color: #61afef;">calculate_duty_cycle</span>(green_value)
+      blue_duty_cycle = <span style="color: #61afef;">calculate_duty_cycle</span>(blue_value)
+        </pre>
+      </div>
+      <ul>
+        <li>
+          Each 8-bit color value (<code>red_value</code>, <code>green_value</code>, <code>blue_value</code>) is passed to the function.
+        </li>
+        <li>
+          The function then returns the duty cycle for each color, which is stored in the variables <code>red_duty_cycle</code>, <code>green_duty_cycle</code>, and <code>blue_duty_cycle</code>.
+        </li>
+      </ul>
+      
+      <!-- =======================
+           Benefits of Using a Function
+           ======================= -->
+      <h3><strong>3. Why Use Functions?</strong></h3>
+      <p>
+        Functions offer several benefits when programming:
+      </p>
+      <ul>
+        <li><strong>Reusability:</strong> The function can be reused multiple times throughout the code without needing to rewrite the calculation.</li>
+        <li><strong>Readability:</strong> Using a function simplifies the main part of the code, making it easier to follow and understand.</li>
+        <li><strong>Maintainability:</strong> If the calculation ever needs to change, you only need to update it inside the function, rather than in every place it is used.</li>
+      </ul>
+      
+      <!-- =======================
+           Full Code with Function
+           ======================= -->
+      <h3><strong>4. Full Code with the Function</strong></h3>
+      <p>
+        Below is the full updated code, incorporating the new function to calculate the duty cycle for the RGB LED module.
+      </p>
+      <div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+        <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+      <span style="color: #61afef;">import</span> <span style="color: #c678dd;">RPi.GPIO</span> <span style="color: #61afef;">as</span> <span style="color: #c678dd;">GPIO</span>
+      <span style="color: #61afef;">import</span> <span style="color: #c678dd;">time</span>
+      
+      <span style="color: #98c379;"># Setup</span>
+      <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setmode</span>(<span style="color: #d19a66;">GPIO.BCM</span>)
+      
+      <span style="color: #98c379;"># Pin assignments</span>
+      <span style="color: #e8fd00;">RED_PIN</span> = <span style="color: #d19a66;">17</span>
+      <span style="color: #e8fd00;">GREEN_PIN</span> = <span style="color: #d19a66;">18</span>
+      <span style="color: #e8fd00;">BLUE_PIN</span> = <span style="color: #d19a66;">27</span>
+      
+      <span style="color: #98c379;"># Set up the pins as outputs</span>
+      <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">RED_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>)
+      <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">GREEN_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>)
+      <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">BLUE_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>)
+      
+      <span style="color: #98c379;"># Set up PWM on each pin with a frequency of 1000 Hz</span>
+      <span style="color: #e8fd00;">pwm_red</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">PWM</span>(<span style="color: #e8fd00;">RED_PIN</span>, <span style="color: #d19a66;">1000</span>)
+      <span style="color: #e8fd00;">pwm_green</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">PWM</span>(<span style="color: #e8fd00;">GREEN_PIN</span>, <span style="color: #d19a66;">1000</span>)
+      <span style="color: #e8fd00;">pwm_blue</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">PWM</span>(<span style="color: #e8fd00;">BLUE_PIN</span>, <span style="color: #d19a66;">1000</span>)
+      
+      <span style="color: #98c379;"># Start PWM with 100 duty cycle (fully off)</span>
+<span style="color: #e8fd00;">pwm_red</span>.<span style="color: #61afef;">start</span>(<span style="color: #d19a66;">100</span>)
+<span style="color: #e8fd00;">pwm_green</span>.<span style="color: #61afef;">start</span>(<span style="color: #d19a66;">100</span>)
+<span style="color: #e8fd00;">pwm_blue</span>.<span style="color: #61afef;">start</span>(<span style="color: #d19a66;">100</span>)
+
+<span style="color: #61afef;">def</span> <span style="color: #c678dd;">calculate_duty_cycle</span>(color_value):
+    <span style="color: #98c379;"># Perform the calculation and return the result</span>
+    <span style="color: #61afef;">return</span> 100 - ((color_value / 255) * 100)
+
+<span style="color: #c678dd;">try</span>:
+    <span style="color: #98c379;"># RGB values as 8-bit values (0-255 range)</span>
+    <span style="color: #e8fd00;">red_value</span> = <span style="color: #d19a66;">127</span>
+    <span style="color: #e8fd00;">green_value</span> = <span style="color: #d19a66;">64</span>
+    <span style="color: #e8fd00;">blue_value</span> = <span style="color: #d19a66;">191</span>
+
+    <span style="color: #98c379;"># Calculate the duty cycles using the function</span>
+    <span style="color: #e8fd00;">red_duty_cycle</span> = <span style="color: #61afef;">calculate_duty_cycle</span>(<span style="color: #e8fd00;">red_value</span>)
+    <span style="color: #e8fd00;">green_duty_cycle</span> = <span style="color: #61afef;">calculate_duty_cycle</span>(<span style="color: #e8fd00;">green_value</span>)
+    <span style="color: #e8fd00;">blue_duty_cycle</span> = <span style="color: #61afef;">calculate_duty_cycle</span>(<span style="color: #e8fd00;">blue_value</span>)
+
+    <span style="color: #98c379;"># Apply the duty cycle to each PWM</span>
+    <span style="color: #e8fd00;">pwm_red</span>.<span style="color: #61afef;">ChangeDutyCycle</span>(<span style="color: #e8fd00;">red_duty_cycle</span>)
+    <span style="color: #e8fd00;">pwm_green</span>.<span style="color: #61afef;">ChangeDutyCycle</span>(<span style="color: #e8fd00;">green_duty_cycle</span>)
+    <span style="color: #e8fd00;">pwm_blue</span>.<span style="color: #61afef;">ChangeDutyCycle</span>(<span style="color: #e8fd00;">blue_duty_cycle</span>)
+
+    <span style="color: #98c379;"># Keep the LEDs on for 10 seconds</span>
+    <span style="color: #c678dd;">time</span>.<span style="color: #61afef;">sleep</span>(<span style="color: #d19a66;">10</span>)
+
+<span style="color: #c678dd;">finally</span>:
+    <span style="color: #98c379;"># Stop PWM and clean up</span>
+    <span style="color: #e8fd00;">pwm_red</span>.<span style="color: #61afef;">stop</span>()
+    <span style="color: #e8fd00;">pwm_green</span>.<span style="color: #61afef;">stop</span>()
+    <span style="color: #e8fd00;">pwm_blue</span>.<span style="color: #61afef;">stop</span>()
+    <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">cleanup</span>()
+  </pre>
+</div>
+<p>
+  This updated code shows how we simplified the duty cycle calculation by using the <code>calculate_duty_cycle()</code> function. Each 8-bit color value (red, green, and blue) is passed into this function to calculate the appropriate duty cycle, which is then applied to the PWM signal controlling the LED brightness.
+</p>
+
+      

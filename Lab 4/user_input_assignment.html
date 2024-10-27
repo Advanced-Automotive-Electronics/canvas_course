@@ -1,0 +1,91 @@
+<h2><strong>Assignment: RGB LED Color Control via User Input</strong></h2>
+<p>In this assignment, you will extend the code you've been working on by allowing the user to input their desired red, green, and blue values. This will give the user full control over the color and intensity of the RGB LED by entering 8-bit values (0-255) for each color.</p>
+<h3><strong>Task Requirements</strong></h3>
+<ol>
+    <li><strong>Modify the Code:</strong> Update the existing code to prompt the user to enter values for the red, green, and blue components of the RGB LED.
+        <ul>
+            <li>Use the <code>input()</code> function to capture user input for each color (red, green, and blue).</li>
+            <li>Ensure the values entered by the user are within the 0-255 range (you can assume correct input for simplicity).</li>
+        </ul>
+    </li>
+    <li><strong>Implement the User Input:</strong> Modify the current <code>red_value</code>, <code>green_value</code>, and <code>blue_value</code> variables so that they are set based on the user&rsquo;s input.</li>
+    <li><strong>Test the LED Behavior:</strong> After receiving the input from the user, the LEDs should change color accordingly, and the brightness of each LED should reflect the 8-bit value entered by the user.</li>
+    <li><strong>Display the Results:</strong> After applying the duty cycles, display the red, green, and blue values in the terminal to confirm that the correct values were entered.</li>
+</ol>
+<h3><strong>Example Code Structure</strong></h3>
+<p>Below is a sample structure of how your code might look with user input for the RGB values:</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+    <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;"><span style="color: #61afef;">import</span> <span style="color: #c678dd;">RPi.GPIO</span> <span style="color: #61afef;">as</span> <span style="color: #c678dd;">GPIO</span>
+<span style="color: #61afef;">import</span> <span style="color: #c678dd;">time</span>
+
+<span style="color: #98c379;"># Setup</span>
+<span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setmode</span>(<span style="color: #d19a66;">GPIO.BCM</span>)
+
+<span style="color: #98c379;"># Pin assignments</span>
+<span style="color: #e8fd00;">RED_PIN</span> = <span style="color: #d19a66;">17</span>
+<span style="color: #e8fd00;">GREEN_PIN</span> = <span style="color: #d19a66;">18</span>
+<span style="color: #e8fd00;">BLUE_PIN</span> = <span style="color: #d19a66;">27</span>
+
+<span style="color: #98c379;"># Set up the pins as outputs</span>
+<span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">RED_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>)
+<span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">GREEN_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>)
+<span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">BLUE_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>)
+
+<span style="color: #98c379;"># Set up PWM on each pin with a frequency of 1000 Hz</span>
+<span style="color: #e8fd00;">pwm_red</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">PWM</span>(<span style="color: #e8fd00;">RED_PIN</span>, <span style="color: #d19a66;">1000</span>)
+<span style="color: #e8fd00;">pwm_green</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">PWM</span>(<span style="color: #e8fd00;">GREEN_PIN</span>, <span style="color: #d19a66;">1000</span>)
+<span style="color: #e8fd00;">pwm_blue</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">PWM</span>(<span style="color: #e8fd00;">BLUE_PIN</span>, <span style="color: #d19a66;">1000</span>)
+
+<span style="color: #98c379;"># Start PWM with 100 duty cycle (fully off)</span>
+    <span style="color: #e8fd00;">pwm_red</span>.<span style="color: #61afef;">start</span>(<span style="color: #d19a66;">100</span>)
+    <span style="color: #e8fd00;">pwm_green</span>.<span style="color: #61afef;">start</span>(<span style="color: #d19a66;">100</span>)
+    <span style="color: #e8fd00;">pwm_blue</span>.<span style="color: #61afef;">start</span>(<span style="color: #d19a66;">100</span>)
+
+<span style="color: #61afef;">def</span> <span style="color: #c678dd;">calculate_duty_cycle</span>(color_value):
+    <span style="color: #98c379;"># Perform the calculation and return the result</span>
+    <span style="color: #61afef;">return</span> 100 - ((color_value / 255) * 100)
+
+    
+        
+      <span style="color: #98c379;"># TODO: Get user input for each color (red, green, blue)</span>
+      <span style="color: #98c379;"># Prompt the user to enter a value between 0 and 255 for each color</span>
+      <span style="color: #e8fd00;">red_value</span> = <span style="color: #61afef;">
+      <span style="color: #e8fd00;">green_value</span> = <span style="color: #61afef;">
+      <span style="color: #e8fd00;">blue_value</span> = <span style="color: #61afef;">
+        
+            
+    <span style="color: #98c379;"># Calculate the duty cycles using the function</span>
+    <span style="color: #e8fd00;">red_duty_cycle</span> = <span style="color: #61afef;">calculate_duty_cycle</span>(<span style="color: #e8fd00;">red_value</span>)
+    <span style="color: #e8fd00;">green_duty_cycle</span> = <span style="color: #61afef;">calculate_duty_cycle</span>(<span style="color: #e8fd00;">green_value</span>)
+    <span style="color: #e8fd00;">blue_duty_cycle</span> = <span style="color: #61afef;">calculate_duty_cycle</span>(<span style="color: #e8fd00;">blue_value</span>)
+
+    <span style="color: #98c379;"># Apply the duty cycle to each PWM</span>
+    <span style="color: #e8fd00;">pwm_red</span>.<span style="color: #61afef;">ChangeDutyCycle</span>(<span style="color: #e8fd00;">red_duty_cycle</span>)
+    <span style="color: #e8fd00;">pwm_green</span>.<span style="color: #61afef;">ChangeDutyCycle</span>(<span style="color: #e8fd00;">green_duty_cycle</span>)
+    <span style="color: #e8fd00;">pwm_blue</span>.<span style="color: #61afef;">ChangeDutyCycle</span>(<span style="color: #e8fd00;">blue_duty_cycle</span>)
+
+    <span style="color: #98c379;"># Display entered values to confirm user input</span>
+    <span style="color: #61afef;">print</span>(<span style="color: #d19a66;">f"Red: {red_value}, Green: {green_value}, Blue: {blue_value}"</span>)
+
+    <span style="color: #98c379;"># Keep the LEDs on for 10 seconds</span>
+    <span style="color: #c678dd;">time</span>.<span style="color: #61afef;">sleep</span>(<span style="color: #d19a66;">10</span>)
+
+<span style="color: #c678dd;">finally</span>:
+    <span style="color: #98c379;"># Stop PWM and clean up</span>
+    <span style="color: #e8fd00;">pwm_red</span>.<span style="color: #61afef;">stop</span>()
+    <span style="color: #e8fd00;">pwm_green</span>.<span style="color: #61afef;">stop</span>()
+    <span style="color: #e8fd00;">pwm_blue</span>.<span style="color: #61afef;">stop</span>()
+    <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">cleanup</span>()
+  </pre>
+</div>
+<h3><strong>Grading Criteria</strong></h3>
+<p>Your assignment will be graded based on the following:</p>
+<ul>
+    <li><strong>Correct User Input:</strong> The program should prompt the user for input and apply the RGB values correctly to the LED module.</li>
+    <li><strong>Code Functionality:</strong> The LED brightness and colors should change according to the user's input values (0-255 range).</li>
+    <li><strong>Code Structure:</strong> The program should use the <code>calculate_duty_cycle()</code> function to simplify the calculation process.</li>
+    <li><strong>Clarity of Output:</strong> The terminal should display the entered RGB values to confirm that the input was processed correctly.</li>
+</ul>
+<h3><strong>Submission Instructions</strong></h3>
+<p>Please submit your Python script along with a video showing the RGB LED module in action. The video should demonstrate that the LEDs change color based on the user's input.</p>
+<p>Ensure that the video clearly shows the code running in the terminal and the RGB LED module responding to the user input.</p>
