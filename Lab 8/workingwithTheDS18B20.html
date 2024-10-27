@@ -1,0 +1,232 @@
+<h1>Working with the DS18B20 Temperature Sensor on a Raspberry Pi</h1>
+<h2>Installing the <code>w1thermsensor</code> Library</h2>
+<p>
+  To work with the DS18B20 sensor on the Raspberry Pi, we'll use the
+  <code>w1thermsensor</code> library, which simplifies interaction with the
+  sensor. Here's how you can install it:
+</p>
+<h3>Steps to Install <code>w1thermsensor</code></h3>
+<ol>
+  <li>Open your Raspberry Pi terminal.</li>
+  <li>Run the following command to install the library:</li>
+</ol>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">sudo</span> pip3 install w1thermsensor --break-system-packages </pre>
+</div>
+<p>
+  This command installs the <code>w1thermsensor</code> library and allows you to
+  read temperature data from the DS18B20 sensor.
+</p>
+<h2>About the DS18B20 Temperature Sensor</h2>
+<p>
+  The DS18B20 is a digital temperature sensor that provides accurate temperature
+  readings over a 1-Wire communication protocol. It is commonly used in various
+  applications due to its simplicity and precision.
+</p>
+<h3>Key Features of the DS18B20:</h3>
+<ul>
+  <li><strong>Temperature range</strong>: -55&deg;C to +125&deg;C</li>
+  <li>
+    <strong>Accuracy</strong>: &plusmn;0.5&deg;C from -10&deg;C to +85&deg;C
+  </li>
+  <li>
+    <strong>1-Wire protocol</strong>: Only requires one data line (plus ground)
+    for communication.
+  </li>
+  <li>
+    <strong>Unique 64-bit address</strong>: Each sensor has a unique address,
+    allowing multiple sensors on the same 1-Wire bus.
+  </li>
+</ul>
+<h3>DS18B20 Sensor Schematic Overview</h3>
+<p>
+  <img
+    src="https://weber.instructure.com/courses/591482/files/115154537/preview"
+    alt="hookup-1.PNG"
+    data-api-endpoint="https://weber.instructure.com/api/v1/courses/591482/files/115154537"
+    data-api-returntype="File"
+  />
+</p>
+<p>
+  The DS18B20 sensor comes on a module, making it easier to use with a Raspberry
+  Pi. The module typically has three pins:
+</p>
+<ul>
+  <li><strong>VCC</strong> (Power): Connected to 3.3V or 5V.</li>
+  <li><strong>GND</strong> (Ground): Connected to ground.</li>
+  <li>
+    <strong>SIG</strong> (Signal): Connected to a GPIO pin (usually GPIO 4 for
+    1-Wire).
+  </li>
+</ul>
+<h4>Schematic</h4>
+<ul>
+  <li>
+    <strong>VCC</strong> &rarr; Provides power to the sensor (typically 3.3V).
+  </li>
+  <li><strong>GND</strong> &rarr; Ground connection.</li>
+  <li>
+    <strong>SIG</strong> &rarr; Data pin that communicates via the 1-Wire
+    protocol.
+  </li>
+</ul>
+<p>
+  On the Raspberry Pi, the SIG pin is usually connected to GPIO 4 (physical pin
+  7) when using the default configuration.
+</p>
+<h3>Wiring Schematic</h3>
+<p>
+  <img
+    src="https://weber.instructure.com/courses/591482/files/115154546/preview"
+    alt="image.png"
+    data-api-endpoint="https://weber.instructure.com/api/v1/courses/591482/files/115154546"
+    data-api-returntype="File"
+  />
+</p>
+<h2>Understanding the DS18B20 Module and Connections</h2>
+<p>
+  The DS18B20 temperature sensor communicates with the Raspberry Pi using the
+  <strong>1-Wire protocol</strong>, a communication protocol that allows
+  multiple devices to communicate over a single data line. This protocol
+  requires only one signal wire (plus ground) to transmit both data and power,
+  making it simple and efficient for use in applications where multiple sensors
+  are involved.
+</p>
+<h3>How 1-Wire Works:</h3>
+<p>
+  The 1-Wire protocol uses a <strong>master-slave architecture</strong>, where
+  the Raspberry Pi acts as the master, and the DS18B20 sensor (or multiple
+  sensors) acts as the slave. Communication occurs over a single data line (the
+  signal pin), and each device on the bus has a
+  <strong>unique 64-bit address</strong>. This unique address allows the
+  Raspberry Pi to identify and communicate with each sensor individually, even
+  when multiple sensors are connected to the same data line.
+</p>
+<p>
+  One of the key features of the 1-Wire protocol is that it allows devices to be
+  powered through the data line itself (referred to as "parasitic power"),
+  although in most applications, the sensor is powered by an external source
+  (3.3V or 5V) for more reliable operation.
+</p>
+<h3>Why We Don&rsquo;t Assign a Pin in the Code:</h3>
+<p>
+  Unlike protocols such as SPI or I2C, where specific pins are dedicated to
+  communication, 1-Wire devices do not need to have a specific GPIO pin assigned
+  in the Python code. This is because the Raspberry Pi&rsquo;s operating system
+  manages the 1-Wire communication through a built-in driver that automatically
+  recognizes devices on the 1-Wire bus.
+</p>
+<p>
+  In this case, the <strong>w1thermsensor</strong> library interfaces with the
+  Raspberry Pi&rsquo;s 1-Wire system. The DS18B20 sensor is typically connected
+  to <strong>GPIO 4 (physical pin 7)</strong> by default, which is the
+  designated pin for 1-Wire communication on the Raspberry Pi. However, the
+  library abstracts the complexity of specifying the exact GPIO pin in the code.
+  Instead, it detects and communicates with the sensor automatically using the
+  underlying system&rsquo;s 1-Wire support.
+</p>
+<p>
+  In summary, the <strong>1-Wire protocol</strong> simplifies the connection and
+  communication process with multiple sensors, and the
+  <strong>w1thermsensor</strong> library further abstracts this by handling the
+  sensor detection and communication without requiring explicit pin assignment
+  in the code.
+</p>
+<h2>Explanation of the Code</h2>
+<p>
+  Let&rsquo;s walk through the Python code that reads the temperature from the
+  DS18B20 sensor using the <code>w1thermsensor</code> library.
+</p>
+<h3>Code Breakdown</h3>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">#!/usr/bin/env python3</span>
+<span style="color: #61afef;">from</span> w1thermsensor <span style="color: #61afef;">import</span> W1ThermSensor
+
+<span style="color: #61afef;">def</span> read_temperature():
+    sensor = W1ThermSensor()  <span style="color: #56b6c2;"># Automatically detects the connected DS18B20 sensor</span>
+    temperature = sensor.get_temperature()  <span style="color: #56b6c2;"># Reads the temperature</span>
+    <span style="color: #61afef;">return</span> temperature
+
+<span style="color: #61afef;">def</span> main():
+    <span style="color: #61afef;">try</span>:
+        <span style="color: #61afef;">while</span> <span style="color: #e8fd00;">True</span>:
+            temperature = read_temperature()  <span style="color: #56b6c2;"># Fetch temperature</span>
+            print(<span style="color: #98c379;">f"Current temperature: {temperature:.3f} &deg;C"</span>)  <span style="color: #56b6c2;"># Print formatted temperature</span>
+    <span style="color: #61afef;">except</span> KeyboardInterrupt:
+        print(<span style="color: #98c379;">"Program stopped"</span>)
+    </pre>
+</div>
+<h3>Explanation:</h3>
+<ol>
+  <li>
+    <strong>Importing the library</strong>: The script starts by importing
+    <code>W1ThermSensor</code> from the <code>w1thermsensor</code> library. This
+    library handles all the complex communication between the Raspberry Pi and
+    the DS18B20 sensor.
+  </li>
+  <li>
+    <strong>read_temperature function</strong>: This function creates an
+    instance of the <code>W1ThermSensor</code> class, which automatically
+    detects the sensor connected to the 1-Wire interface. It then calls
+    <code>get_temperature()</code> to retrieve the current temperature in
+    Celsius.
+  </li>
+  <li>
+    <strong>Main loop</strong>: The <code>main()</code> function continuously
+    reads and prints the current temperature until interrupted (e.g., by
+    pressing <code>Ctrl+C</code>). This loop ensures that the temperature is
+    updated and displayed in real-time.
+  </li>
+</ol>
+<h3>Important Notes:</h3>
+<ul>
+  <li>The temperature is displayed in <strong>Celsius</strong>.</li>
+  <li>
+    The <code>try-except</code> block is used to gracefully stop the program
+    when the user interrupts it with <code>Ctrl+C</code>.
+  </li>
+</ul>
+<h2>Running the Code in Visual Studio Code</h2>
+<p>
+  Once you've completed the wiring and installed the necessary libraries, you
+  can run the Python code to read temperature data from the DS18B20 sensor
+  directly in Visual Studio Code (VS Code).
+</p>
+<h2>Conclusion</h2>
+<p>
+  By using the <code>w1thermsensor</code> library, interacting with the DS18B20
+  temperature sensor becomes much easier, as it abstracts the complexities of
+  the 1-Wire protocol. This page has covered the steps to install the library,
+  explained the Python code to read temperature data, and reviewed the DS18B20
+  sensor and its wiring schematic.
+</p>
+<p>
+  Feel free to test the code on your Raspberry Pi and ensure the sensor is
+  connected properly!
+</p>
+<hr />
+<h3>Assignment Submission:</h3>
+<ul>
+  <li>
+    <strong>Submit a picture</strong> of your code running in VS Code, along
+    with a picture of your sensor setup. Ensure both the
+    <strong>output in the terminal</strong> and your <strong>wiring</strong> are
+    clearly visible.
+  </li>
+</ul>

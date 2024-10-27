@@ -1,0 +1,297 @@
+
+<!-- =======================
+     Step 1: Import Libraries
+     ======================= -->
+     <h3><strong>1. Import Libraries</strong></h3>
+     <div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+         <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+     <span style="color: #61afef;">import</span> <span style="color: #c678dd;">RPi.GPIO</span> <span style="color: #61afef;">as</span> <span style="color: #c678dd;">GPIO</span>
+     <span style="color: #61afef;">import</span> <span style="color: #c678dd;">time</span> <span style="color: #98c379;"># Import time module for delays</span>
+         </pre>
+     </div>
+     <p>
+         - Import the necessary libraries:
+         <ul>
+             <li><code>RPi.GPIO</code>: Controls the GPIO pins on the Raspberry Pi.</li>
+             <li><code>time</code>: Provides functions to create delays (e.g., <code>time.sleep()</code>).</li>
+         </ul>
+     </p>
+     
+     <!-- =======================
+          Step 2: Set Up the GPIO Mode
+          ======================= -->
+     <h3><strong>2. Set Up the GPIO Mode</strong></h3>
+     <div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+         <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+     <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setmode</span>(<span style="color: #d19a66;">GPIO.BCM</span>) <span style="color: #98c379;"># Use BCM GPIO numbering</span>
+         </pre>
+     </div>
+     <p>
+         - Set the GPIO mode to BCM (Broadcom) numbering:
+         <ul>
+             <li>This numbering system corresponds to the GPIO numbers on the Raspberry Pi board.</li>
+             <li>Allows us to refer to the GPIO pins directly as <code>GPIO17</code>, <code>GPIO18</code>, etc.</li>
+         </ul>
+     </p>
+     
+     <!-- =======================
+          Step 3: Define Constants
+          ======================= -->
+     <h3><strong>3. Define Constants</strong></h3>
+     <div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+         <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+     <span style="color: #e8fd00;">RED_PIN</span> = <span style="color: #d19a66;">17</span> <span style="color: #98c379;"># GPIO pin connected to the red LED</span>
+     <span style="color: #e8fd00;">GREEN_PIN</span> = <span style="color: #d19a66;">18</span> <span style="color: #98c379;"># GPIO pin connected to the green LED</span>
+     <span style="color: #e8fd00;">BLUE_PIN</span> = <span style="color: #d19a66;">27</span> <span style="color: #98c379;"># GPIO pin connected to the blue LED</span>
+     <span style="color: #e8fd00;">PWM_FREQUENCY</span> = <span style="color: #d19a66;">1000</span> <span style="color: #98c379;"># Frequency of the PWM signal (in Hertz)</span>
+         </pre>
+     </div>
+     <p>
+         - Define constants for the RGB LED pins and PWM frequency:
+         <ul>
+             <li><code>RED_PIN</code>: GPIO pin for the red LED.</li>
+             <li><code>GREEN_PIN</code>: GPIO pin for the green LED.</li>
+             <li><code>BLUE_PIN</code>: GPIO pin for the blue LED.</li>
+             <li><code>PWM_FREQUENCY</code>: Sets the frequency for PWM control (1000 Hz).</li>
+         </ul>
+     </p>
+     
+     <!-- =======================
+          Step 4: Set Up the GPIO Pins
+          ======================= -->
+     <h3><strong>4. Set Up the GPIO Pins</strong></h3>
+     <div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+         <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+     <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">RED_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>) <span style="color: #98c379;"># Set the red LED pin as an output</span>
+     <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">GREEN_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>) <span style="color: #98c379;"># Set the green LED pin as an output</span>
+     <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">BLUE_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>) <span style="color: #98c379;"># Set the blue LED pin as an output</span>
+         </pre>
+     </div>
+     <p>
+         - Configure each GPIO pin as an output:
+         <ul>
+             <li>Prepares the RGB LED pins for PWM control.</li>
+             <li>Ensures each pin is ready to control its respective LED (red, green, blue).</li>
+         </ul>
+     </p>
+     
+     <!-- =======================
+          Step 5: Set Up PWM for Each Pin
+          ======================= -->
+     <h3><strong>5. Set Up PWM for Each Pin</strong></h3>
+     <div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+         <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+     <span style="color: #e8fd00;">pwm_red</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">PWM</span>(<span style="color: #e8fd00;">RED_PIN</span>, <span style="color: #e8fd00;">PWM_FREQUENCY</span>)
+     <span style="color: #e8fd00;">pwm_green</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">PWM</span>(<span style="color: #e8fd00;">GREEN_PIN</span>, <span style="color: #e8fd00;">PWM_FREQUENCY</span>)
+     <span style="color: #e8fd00;">pwm_blue</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">PWM</span>(<span style="color: #e8fd00;">BLUE_PIN</span>, <span style="color: #e8fd00;">PWM_FREQUENCY</span>)
+         </pre>
+     </div>
+     <p>
+         - Initialize PWM on each RGB LED pin:
+         <ul>
+             <li>Enables control of LED brightness using PWM.</li>
+             <li>Sets up each PWM instance with the defined frequency (1000 Hz).</li>
+         </ul>
+     </p>
+    <!-- =======================
+     Step 6: Start PWM
+     ======================= -->
+<h3><strong>6. Start PWM</strong></h3>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+    <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+<span style="color: #e8fd00;">pwm_red</span>.<span style="color: #61afef;">start</span>(<span style="color: #d19a66;">100</span>) <span style="color: #98c379;"># Start PWM with 100% duty cycle (LED off)</span>
+<span style="color: #e8fd00;">pwm_green</span>.<span style="color: #61afef;">start</span>(<span style="color: #d19a66;">100</span>) <span style="color: #98c379;"># Start PWM with 100% duty cycle (LED off)</span>
+<span style="color: #e8fd00;">pwm_blue</span>.<span style="color: #61afef;">start</span>(<span style="color: #d19a66;">100</span>) <span style="color: #98c379;"># Start PWM with 100% duty cycle (LED off)</span>
+    </pre>
+</div>
+<p>
+    - Start PWM on each pin with a 100% duty cycle:
+    <ul>
+        <li>The RGB module turns on when the LEDs are grounded, so a 100% duty cycle keeps them off initially.</li>
+        <li>Ensures that the LEDs start in an off state before we adjust their brightness.</li>
+    </ul>
+</p>
+
+### Step 7: Set RGB Values
+
+```html
+<!-- =======================
+     Step 7: Set RGB Values
+     ======================= -->
+<h3><strong>7. Set RGB Values</strong></h3>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+    <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+<span style="color: #e8fd00;">red_value</span> = <span style="color: #d19a66;">127</span> <span style="color: #98c379;"># Example value for red intensity</span>
+<span style="color: #e8fd00;">green_value</span> = <span style="color: #d19a66;">64</span> <span style="color: #98c379;"># Example value for green intensity</span>
+<span style="color: #e8fd00;">blue_value</span> = <span style="color: #d19a66;">191</span> <span style="color: #98c379;"># Example value for blue intensity</span>
+    </pre>
+</div>
+<p>
+    - Define 8-bit values for each color (0-255):
+    <ul>
+        <li>Controls the intensity of each LED (red, green, and blue).</li>
+        <li>Example values: <code>127</code> for red, <code>64</code> for green, <code>191</code> for blue.</li>
+    </ul>
+</p>
+
+### Step 8: Calculate Duty Cycles
+
+```html
+<!-- =======================
+     Step 8: Calculate Duty Cycles
+     ======================= -->
+<h3><strong>8. Calculate Duty Cycles</strong></h3>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+    <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+<span style="color: #e8fd00;">red_duty_cycle</span> = <span style="color: #d19a66;">100</span> - ((<span style="color: #e8fd00;">red_value</span> / <span style="color: #d19a66;">255</span>) * <span style="color: #d19a66;">100</span>)
+<span style="color: #e8fd00;">green_duty_cycle</span> = <span style="color: #d19a66;">100</span> - ((<span style="color: #e8fd00;">green_value</span> / <span style="color: #d19a66;">255</span>) * <span style="color: #d19a66;">100</span>)
+<span style="color: #e8fd00;">blue_duty_cycle</span> = <span style="color: #d19a66;">100</span> - ((<span style="color: #e8fd00;">blue_value</span> / <span style="color: #d19a66;">255</span>) * <span style="color: #d19a66;">100</span>)
+    </pre>
+</div>
+<p>
+    - Calculate the duty cycle for each color based on the 8-bit values:
+    <ul>
+        <li>Converts the 8-bit value to a percentage (0-100%).</li>
+        <li>Inverts the value (100 - calculated percentage) because the RGB module activates when LEDs are grounded.</li>
+        <li>Ensures correct brightness levels based on the 8-bit intensity values set earlier.</li>
+    </ul>
+</p>
+
+### Step 9: Apply Duty Cycles
+
+```html
+<!-- =======================
+     Step 9: Apply Duty Cycles
+     ======================= -->
+<h3><strong>9. Apply Duty Cycles</strong></h3>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+    <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+<span style="color: #e8fd00;">pwm_red</span>.<span style="color: #61afef;">ChangeDutyCycle</span>(<span style="color: #e8fd00;">red_duty_cycle</span>)
+<span style="color: #e8fd00;">pwm_green</span>.<span style="color: #61afef;">ChangeDutyCycle</span>(<span style="color: #e8fd00;">green_duty_cycle</span>)
+<span style="color: #e8fd00;">pwm_blue</span>.<span style="color: #61afef;">ChangeDutyCycle</span>(<span style="color: #e8fd00;">blue_duty_cycle</span>)
+    </pre>
+</div>
+<p>
+    - Apply the calculated duty cycles to control LED brightness:
+    <ul>
+        <li>Updates the PWM signal for each LED with the calculated duty cycle.</li>
+        <li>Adjusts brightness levels in real-time based on the RGB values set earlier.</li>
+    </ul>
+</p>
+
+<!-- =======================
+     Step 10: Adding a Delay Using time.sleep()
+     ======================= -->
+     <h3><strong>10. Adding a Delay Using <code>time.sleep()</code></strong></h3>
+     <div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+         <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+     <span style="color: #c678dd;">time</span>.<span style="color: #61afef;">sleep</span>(<span style="color: #d19a66;">10</span>) <span style="color: #98c379;"># Run the program for 10 seconds before cleanup</span>
+         </pre>
+     </div>
+     <p>
+         - Add a delay to the program using <code>time.sleep()</code>:
+         <ul>
+             <li>Pauses the execution for 10 seconds, keeping the LEDs on at the set brightness.</li>
+             <li>Since this is a fixed-duration script, a <code>try...except</code> block for <code>KeyboardInterrupt</code> is not needed.</li>
+             <li>Ensures the program runs for a defined period before cleanup.</li>
+         </ul>
+     </p>
+     
+<!-- =======================
+     Step 11: Cleanup and Release GPIO Resources
+     ======================= -->
+     <h3><strong>11. Cleanup and Release GPIO Resources</strong></h3>
+     <div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+         <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+     <span style="color: #e8fd00;">pwm_red</span>.<span style="color: #61afef;">stop</span>() <span style="color: #98c379;"># Stop the PWM signal for the red LED</span>
+     <span style="color: #e8fd00;">pwm_green</span>.<span style="color: #61afef;">stop</span>() <span style="color: #98c379;"># Stop the PWM signal for the green LED</span>
+     <span style="color: #e8fd00;">pwm_blue</span>.<span style="color: #61afef;">stop</span>() <span style="color: #98c379;"># Stop the PWM signal for the blue LED</span>
+     
+     <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">cleanup</span>() <span style="color: #98c379;"># Reset the GPIO settings to their default state</span>
+         </pre>
+     </div>
+     <p>
+         - Cleanup and release GPIO resources:
+         <ul>
+             <li>Stops the PWM signals for all LEDs to prevent any unintended behavior.</li>
+             <li>Resets the GPIO pins to their default state using <code>GPIO.cleanup()</code>.</li>
+             <li>Ensures safe and proper handling of the GPIO pins for future use.</li>
+         </ul>
+     </p>
+<!-- =======================
+     Note for Assignment
+     ======================= -->
+     <h3><strong>Note for Assignment</strong></h3>
+     <p>
+         For the assignment:
+         <ul>
+             <li>Keep your setup connected after completing the lab as you will need to record a video.</li>
+             <li>In the video, demonstrate the RGB LED module in operation, showing the PWM control and LED behavior.</li>
+             <li>Ensure everything is functioning correctly before recording to avoid any issues during submission.</li>
+         </ul>
+     </p>
+
+
+<!-- =======================
+     Full Code Reference
+     ======================= -->
+     <h3><strong>Full Code Reference</strong></h3>
+     <p>
+         Below is the full code used in this lab. You can refer to this when reviewing your setup or recording your video for the assignment.
+     </p>
+     <div style="background-color: #2e3440; padding: 10px; border-radius: 5px;">
+         <pre style="font-size: 18px; background-color: #2e3440; color: #d8dee9; padding: 10px; border-radius: 5px;">
+     <span style="color: #61afef;">import</span> <span style="color: #c678dd;">RPi.GPIO</span> <span style="color: #61afef;">as</span> <span style="color: #c678dd;">GPIO</span>
+     <span style="color: #61afef;">import</span> <span style="color: #c678dd;">time</span>
+     
+     <span style="color: #98c379;"># Setup</span>
+     <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setmode</span>(<span style="color: #d19a66;">GPIO.BCM</span>)
+     
+     <span style="color: #98c379;"># Pin assignments</span>
+     <span style="color: #e8fd00;">RED_PIN</span> = <span style="color: #d19a66;">17</span>
+     <span style="color: #e8fd00;">GREEN_PIN</span> = <span style="color: #d19a66;">18</span>
+     <span style="color: #e8fd00;">BLUE_PIN</span> = <span style="color: #d19a66;">27</span>
+     
+     <span style="color: #98c379;"># Set up the pins as outputs</span>
+     <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">RED_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>)
+     <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">GREEN_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>)
+     <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">setup</span>(<span style="color: #e8fd00;">BLUE_PIN</span>, <span style="color: #d19a66;">GPIO.OUT</span>)
+     
+     <span style="color: #98c379;"># Set up PWM on each pin with a frequency of 1000 Hz</span>
+     <span style="color: #e8fd00;">pwm_red</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">PWM</span>(<span style="color: #e8fd00;">RED_PIN</span>, <span style="color: #d19a66;">1000</span>)
+     <span style="color: #e8fd00;">pwm_green</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">PWM</span>(<span style="color: #e8fd00;">GREEN_PIN</span>, <span style="color: #d19a66;">1000</span>)
+     <span style="color: #e8fd00;">pwm_blue</span> = <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">PWM</span>(<span style="color: #e8fd00;">BLUE_PIN</span>, <span style="color: #d19a66;">1000</span>)
+     
+     <span style="color: #98c379;"># Start PWM with 100% duty cycle (LEDs off)</span>
+     <span style="color: #e8fd00;">pwm_red</span>.<span style="color: #61afef;">start</span>(<span style="color: #d19a66;">100</span>)
+     <span style="color: #e8fd00;">pwm_green</span>.<span style="color: #61afef;">start</span>(<span style="color: #d19a66;">100</span>)
+     <span style="color: #e8fd00;">pwm_blue</span>.<span style="color: #61afef;">start</span>(<span style="color: #d19a66;">100</span>)
+     
+     <span style="color: #c678dd;">try</span>:
+         <span style="color: #98c379;"># RGB values as 8-bit values (0-255 range)</span>
+         <span style="color: #e8fd00;">red_value</span> = <span style="color: #d19a66;">127</span>
+         <span style="color: #e8fd00;">green_value</span> = <span style="color: #d19a66;">64</span>
+         <span style="color: #e8fd00;">blue_value</span> = <span style="color: #d19a66;">191</span>
+     
+         <span style="color: #98c379;"># Invert the duty cycle because of the low-side driver (100 - value)</span>
+         <span style="color: #e8fd00;">red_duty_cycle</span> = <span style="color: #d19a66;">100</span> - ((<span style="color: #e8fd00;">red_value</span> / <span style="color: #d19a66;">255</span>) * <span style="color: #d19a66;">100</span>)
+         <span style="color: #e8fd00;">green_duty_cycle</span> = <span style="color: #d19a66;">100</span> - ((<span style="color: #e8fd00;">green_value</span> / <span style="color: #d19a66;">255</span>) * <span style="color: #d19a66;">100</span>)
+         <span style="color: #e8fd00;">blue_duty_cycle</span> = <span style="color: #d19a66;">100</span> - ((<span style="color: #e8fd00;">blue_value</span> / <span style="color: #d19a66;">255</span>) * <span style="color: #d19a66;">100</span>)
+     
+         <span style="color: #98c379;"># Apply the duty cycle to each PWM</span>
+         <span style="color: #e8fd00;">pwm_red</span>.<span style="color: #61afef;">ChangeDutyCycle</span>(<span style="color: #e8fd00;">red_duty_cycle</span>)
+         <span style="color: #e8fd00;">pwm_green</span>.<span style="color: #61afef;">ChangeDutyCycle</span>(<span style="color: #e8fd00;">green_duty_cycle</span>)
+         <span style="color: #e8fd00;">pwm_blue</span>.<span style="color: #61afef;">ChangeDutyCycle</span>(<span style="color: #e8fd00;">blue_duty_cycle</span>)
+     
+         <span style="color: #98c379;"># Keep the LEDs on for 10 seconds</span>
+         <span style="color: #c678dd;">time</span>.<span style="color: #61afef;">sleep</span>(<span style="color: #d19a66;">10</span>)
+     
+     <span style="color: #c678dd;">finally</span>:
+         <span style="color: #98c379;"># Stop PWM and clean up</span>
+         <span style="color: #e8fd00;">pwm_red</span>.<span style="color: #61afef;">stop</span>()
+         <span style="color: #e8fd00;">pwm_green</span>.<span style="color: #61afef;">stop</span>()
+         <span style="color: #e8fd00;">pwm_blue</span>.<span style="color: #61afef;">stop</span>()
+         <span style="color: #c678dd;">GPIO</span>.<span style="color: #61afef;">cleanup</span>()
+         </pre>
+     </div>
+     

@@ -1,0 +1,395 @@
+<h3>Lab 9: Using the PCF8591 for Analog Input and Output Control</h3>
+<h4><strong>Introduction</strong></h4>
+<p>
+  In this lab, we will explore the PCF8591, a versatile 8-bit CMOS data
+  acquisition device that includes four analog inputs, one analog output, and
+  communicates using the I2C-bus protocol. This makes it ideal for reading
+  analog sensors and controlling analog devices in projects using the Raspberry
+  Pi.
+</p>
+<p>
+  The <strong>Raspberry Pi</strong> on its own does not have built-in
+  capabilities to handle analog signals, as it is purely a digital device. It
+  can only process digital inputs and outputs (0 or 1). To deal with real-world
+  sensors and outputs, which often use analog signals (e.g., temperature sensors
+  or controlling LED brightness), we need an external component like the
+  <strong>PCF8591</strong> to convert between analog and digital signals. The
+  PCF8591 bridges this gap by performing both
+  <strong>analog-to-digital conversion (ADC)</strong> and
+  <strong>digital-to-analog conversion (DAC)</strong>.
+</p>
+<p>
+  <img
+    src="https://weber.instructure.com/courses/591482/files/115153931/preview"
+    alt="IMG_0070.jpg"
+    width="935"
+    height="1004"
+    data-api-endpoint="https://weber.instructure.com/api/v1/courses/591482/files/115153931"
+    data-api-returntype="File"
+  />
+</p>
+<p>The PCF8591 features:</p>
+<ul>
+  <li>
+    <strong>Analog Input Multiplexing:</strong> Four analog input channels allow
+    connection to multiple sensors.
+  </li>
+  <li>
+    <strong>Track and Hold Function:</strong> Ensures stability in analog signal
+    readings.
+  </li>
+  <li>
+    <strong>8-bit Analog-to-Digital Conversion (ADC):</strong> Converts analog
+    signals into digital values that can be processed by the Raspberry Pi.
+  </li>
+  <li>
+    <strong>8-bit Digital-to-Analog Conversion (DAC):</strong> Outputs analog
+    signals, which can control devices like LEDs or motors.
+  </li>
+</ul>
+<p>
+  This device is especially useful for projects that involve both reading analog
+  sensor values and controlling devices with analog outputs. In this lab, we
+  will be interfacing the PCF8591 with a dual-color LED module, using the analog
+  input to control the LED's brightness.
+</p>
+<h4><strong>Required Components</strong></h4>
+<ul>
+  <li>Raspberry Pi</li>
+  <li>Breadboard</li>
+  <li>Jumper wires</li>
+  <li>PCF8591 module</li>
+  <li>Dual-color LED module</li>
+  <li>3-Pin anti-reverse cable</li>
+</ul>
+<h4><strong>Experimental Principle</strong></h4>
+<p>
+  The <strong>PCF8591</strong> operates on the I2C-bus protocol, allowing
+  multiple devices to communicate over the same data lines. It uses address pins
+  (A0, A1, A2) to allow up to eight PCF8591 devices to coexist on the same I2C
+  bus. You will address the specific device in the system by sending its unique
+  address, followed by a control byte that determines the operation (read or
+  write).
+</p>
+<ul>
+  <li>
+    <strong>Addressing:</strong> The PCF8591's address has two parts: a fixed
+    section and a programmable section. The address is sent as the first byte
+    after the start condition in the I2C communication.
+  </li>
+  <li>
+    <strong>Control Byte:</strong> The second byte is used to enable the analog
+    output and select the input channels for the analog-to-digital conversion.
+    By setting the auto-increment flag, the device can automatically cycle
+    through the analog input channels after each conversion.
+  </li>
+</ul>
+<p>
+  In this lab, <strong>AIN0</strong> will be used to receive analog signals, and
+  the <strong>AOUT</strong> pin will output the corresponding signals to the
+  dual-color LED module. This output will control the brightness of the LED
+  based on the input signal.
+</p>
+<h4><strong>Schematic Diagram</strong></h4>
+<p>
+  <img
+    src="https://weber.instructure.com/courses/591482/files/115153937/preview"
+    alt="image.png"
+    data-api-endpoint="https://weber.instructure.com/api/v1/courses/591482/files/115153937"
+    data-api-returntype="File"
+  />
+</p>
+<h4><strong>Experimental Procedures</strong></h4>
+<h3><strong>Step 1: Build the Circuit</strong></h3>
+<p>
+  In this step, we&rsquo;ll be connecting the <strong>PCF8591</strong> module
+  and the <strong>dual-color LED module</strong> to the Raspberry Pi using a
+  <strong>4-pin JST connector</strong> and a
+  <strong>female-to-male jumper</strong> for A0. Since the connector on the
+  PCF8591 module is just a header, pay close attention to the orientation of the
+  wires. Here&rsquo;s how to connect everything:
+</p>
+<h4><strong>PCF8591 Connections:</strong></h4>
+<p>
+  <strong
+    ><img
+      src="https://weber.instructure.com/courses/591482/files/115154423/preview"
+      alt="image.png"
+      data-api-endpoint="https://weber.instructure.com/api/v1/courses/591482/files/115154423"
+      data-api-returntype="File"
+  /></strong>
+</p>
+<ul>
+  <li>
+    <p><strong>4-Pin JST Connector:</strong></p>
+    <ul>
+      <li>
+        The <strong>brown wire</strong> connects to <strong>VCC</strong> on the
+        PCF8591 header.
+      </li>
+      <li>
+        The <strong>white wire</strong> connects to <strong>GND</strong> on the
+        PCF8591 header.
+      </li>
+      <li>
+        The <strong>red wire</strong> connects to <strong>SCL</strong> on the
+        PCF8591 header.
+      </li>
+      <li>
+        The <strong>black wire</strong> connects to <strong>SDA</strong> on the
+        PCF8591 header.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Raspberry Pi GPIO Connections:</strong></p>
+    <ul>
+      <li>
+        The <strong>brown wire</strong> (VCC) connects to
+        <strong>3.3V</strong> (physical pin 1) on the Raspberry Pi.
+      </li>
+      <li>
+        The <strong>white wire</strong> (GND) connects to
+        <strong>GND</strong> (physical pin 39) on the Raspberry Pi.
+      </li>
+      <li>
+        The <strong>red wire</strong> (SCL) connects to
+        <strong>SCL1</strong> (physical pin 5) on the Raspberry Pi.
+      </li>
+      <li>
+        The <strong>black wire</strong> (SDA) connects to
+        <strong>SDA1</strong> (physical pin 3) on the Raspberry Pi.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>A0 Output:</strong></p>
+    <ul>
+      <li>
+        Use a <strong>female-to-male jumper</strong> for the
+        <strong>A0</strong> pin of the PCF8591.
+      </li>
+      <li>
+        Connect the <strong>female side</strong> of the jumper to the
+        <strong>A0</strong> output pin on the PCF8591 module.
+      </li>
+      <li>
+        Connect the <strong>male end</strong> of the jumper to an
+        <strong>empty row</strong> on the breadboard (I am using row 25). My
+        jumper is <strong>brown</strong>, but the color doesn&rsquo;t matter.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h4><strong>Dual-Color LED Module Connections:</strong></h4>
+<ul>
+  <li>
+    <p><strong>R Pin</strong> (Red LED):</p>
+    <ul>
+      <li>
+        The <strong>yellow wire</strong> from the LED module will also connect
+        to <strong>row 25</strong> on the breadboard, the same row as the jumper
+        wire from <strong>A0</strong>.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>G Pin</strong> (Green LED):</p>
+    <ul>
+      <li>
+        The <strong>G Pin</strong> will not be connected in this experiment.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>GND Pin</strong> (Ground):</p>
+    <ul>
+      <li>
+        Connect the <strong>GND</strong> pin of the LED module to the
+        <strong>lowest ground pin</strong> on the positive side of the Raspberry
+        Pi, typically <strong>physical pin 6</strong>.
+      </li>
+    </ul>
+  </li>
+</ul>
+<p>
+  Make sure all connections are secure, and double-check the orientation of the
+  wires to avoid incorrect connections that could damage the components.
+</p>
+<h5><strong>Step 2: Verify Potentiometer Connections</strong></h5>
+<p>
+  <img
+    src="https://weber.instructure.com/courses/591482/files/115154467/preview"
+    alt="image.png"
+    data-api-endpoint="https://weber.instructure.com/api/v1/courses/591482/files/115154467"
+    data-api-returntype="File"
+  />
+</p>
+<p>
+  <strong>THIS SHOULD ALREADY BE IN PLACE, JUST VERIFY.</strong> The two pins
+  next to the potentiometer on the PCF8591 module should already be connected
+  using the attached jumper cap. This jumper cap allows the potentiometer to
+  control the analog signal fed into the AIN0 pin of the PCF8591.
+</p>
+<p>
+  If the jumper cap is missing or loose, make sure to connect it properly across
+  the two designated pins to ensure the potentiometer functions correctly. This
+  step is critical for generating the analog input that the PCF8591 will read
+  and use to control the output.
+</p>
+<h5><strong>Step 3: Use the Provided Code</strong></h5>
+<p>The code for this lab is located at:</p>
+<p><strong>Lab9/demo_code/pcf8591_led_control.py</strong></p>
+<p>
+  This script handles communication with the PCF8591, reads the analog input
+  from AIN0, and controls the dual-color LED&rsquo;s brightness using the AOUT
+  pin. Here&rsquo;s the code you will be using:
+</p>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #61afef;">#!/usr/bin/env python3</span>
+<span style="color: #61afef;">import</span> PCF8591 <span style="color: #61afef;">as</span> ADC
+<span style="color: #61afef;">import</span> time
+
+<span style="color: #61afef;"># Address of the PCF8591 on the I2C bus</span>
+PCF8591_ADDRESS = <span style="color: #d19a66;">0x48</span>
+
+<span style="color: #61afef;"># Function to initialize the PCF8591</span>
+<span style="color: #61afef;">def</span> setup():
+    ADC.setup(PCF8591_ADDRESS)
+    print(<span style="color: #98c379;">"PCF8591 initialized"</span>)
+
+<span style="color: #61afef;"># Function to read the analog value from AIN0</span>
+<span style="color: #61afef;">def</span> read_analog_input():
+    <span style="color: #61afef;">return</span> ADC.read(<span style="color: #d19a66;">0</span>)
+
+<span style="color: #61afef;"># Function to write the analog value to AOUT</span>
+<span style="color: #61afef;">def</span> write_analog_output(value):
+    ADC.write(value)
+
+<span style="color: #61afef;"># Main loop function</span>
+<span style="color: #61afef;">def</span> loop():
+    <span style="color: #61afef;">try</span>:
+        <span style="color: #61afef;">while</span> <span style="color: #e8fd00;">True</span>:
+            analog_value = read_analog_input()  <span style="color: #56b6c2;"># Read from AIN0</span>
+            print(f<span style="color: #98c379;">"Analog input value: {analog_value}"</span>)
+            
+            write_analog_output(analog_value)  <span style="color: #56b6c2;"># Write to AOUT</span>
+            time.sleep(<span style="color: #d19a66;">0.1</span>)  <span style="color: #56b6c2;"># Small delay</span>
+
+    <span style="color: #61afef;">except</span> KeyboardInterrupt:
+        destroy()
+
+<span style="color: #61afef;"># Function to cleanup on exit</span>
+<span style="color: #61afef;">def</span> destroy():
+    print(<span style="color: #98c379;">"Exiting..."</span>)
+    ADC.write(<span style="color: #d19a66;">0</span>)  <span style="color: #56b6c2;"># Turn off output</span>
+    print(<span style="color: #98c379;">"Analog output turned off"</span>)
+
+<span style="color: #61afef;"># Main execution</span>
+<span style="color: #61afef;">if</span> __name__ == <span style="color: #98c379;">"__main__"</span>:
+    setup()  <span style="color: #56b6c2;"># Initialize PCF8591</span>
+    loop()   <span style="color: #56b6c2;"># Start the main loop</span>
+    </pre>
+</div>
+<h5><strong>Step 4: Test the Circuit</strong></h5>
+<ul>
+  <li>
+    Run the code on your Raspberry Pi and observe the behavior of the dual-color
+    LED.
+  </li>
+  <li>
+    Turn the knob of the potentiometer on the PCF8591 module, and you should see
+    the luminance of the LED change.
+  </li>
+  <li>
+    Additionally, you will see a value between 0 and 255 printed on the screen,
+    representing the analog input.
+  </li>
+</ul>
+<h4><strong>Handling Analog Output with the LED</strong></h4>
+<p>
+  The dual-color LED is controlled using the analog output from the PCF8591
+  module through its <strong>AOUT</strong> pin. Here's how it handles the analog
+  signal:
+</p>
+<ul>
+  <li>
+    <strong>Analog Output Control:</strong> The PCF8591 converts a digital value
+    between 0 and 255 into an analog voltage between 0V and 3.3V. The higher the
+    digital value, the higher the output voltage.
+  </li>
+  <li>
+    <strong>Brightness Adjustment:</strong> The LED brightness changes according
+    to the output voltage. A higher voltage results in a brighter LED, while a
+    lower voltage dims the LED.
+  </li>
+  <li>
+    <strong>Simulating PWM:</strong> Although the output is analog, it mimics
+    the effect of PWM (Pulse Width Modulation). The voltage levels control the
+    intensity of the LED, similar to how PWM would.
+  </li>
+  <li>
+    <strong>Color Control:</strong> In this experiment, only the red LED is
+    connected. If both red and green LEDs were connected, their brightness could
+    be independently controlled by adjusting the voltage output.
+  </li>
+</ul>
+<p>
+  The analog output effectively controls the LED&rsquo;s luminance by modulating
+  the voltage level, creating smooth transitions in brightness as the
+  potentiometer is adjusted.
+</p>
+<h4><strong>Troubleshooting</strong></h4>
+<ul>
+  <li>
+    <p>
+      <strong
+        >FileNotFoundError: [Errno 2] No such file or directory:
+        '/dev/i2c-1':</strong
+      >
+      If you encounter this error, you need to enable I2C on your Raspberry Pi.
+      (See <strong>I2C Configuration</strong> instructions).
+    </p>
+  </li>
+  <li>
+    <p>
+      <strong>ModuleNotFoundError: No module named 'smbus2':</strong> If you get
+      this error, you need to install the <code>smbus2</code> library by
+      running:
+    </p>
+    <div
+      class="contain-inline-size rounded-md border-[0.5px] border-token-border-medium relative bg-token-sidebar-surface-primary dark:bg-gray-950"
+    >
+      <div class="overflow-y-auto p-4" dir="ltr">
+        <code class="!whitespace-pre hljs language-bash"
+          >sudo pip3 install smbus2
+        </code>
+      </div>
+    </div>
+  </li>
+  <li>
+    <p>
+      <strong>OSError: [Errno 121] Remote I/O Error:</strong> This error
+      typically indicates that the module is miswired or malfunctioning.
+      Double-check your wiring and ensure the module is functioning correctly.
+    </p>
+  </li>
+</ul>
+<h4><strong>Conclusion</strong></h4>
+<p>
+  By completing this lab, you will gain hands-on experience with the PCF8591
+  module, analog-to-digital and digital-to-analog conversions, and the I2C
+  communication protocol. This knowledge is essential for integrating analog
+  sensors and devices into larger projects, such as automotive electronics
+  systems. Additionally, this lab highlights how the Raspberry Pi alone lacks
+  the ability to handle analog input and output, making modules like the PCF8591
+  vital for working with real-world signals.
+</p>

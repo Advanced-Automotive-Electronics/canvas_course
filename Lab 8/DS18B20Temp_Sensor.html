@@ -1,0 +1,149 @@
+<h3>Requesting Temperature from the DS18B20 Sensor via Terminal</h3>
+<p>
+  Once your DS18B20 temperature sensor is set up and connected, you can request
+  the temperature data directly from the terminal. The sensor communicates using
+  the 1-Wire protocol, and the Raspberry Pi can directly access its readings
+  through the system files.
+</p>
+<h4>Steps to Request the Temperature in the Terminal:</h4>
+<ol>
+  <li>
+    <p><strong>Ensure your sensor is connected:</strong></p>
+    <ul>
+      <li>The sensor should be connected to GPIO 4, physical pin 7.</li>
+      <li>Ensure the VCC and GND connections are properly set up.</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Verify that the sensor is detected:</strong></p>
+    <ul>
+      <li>
+        Use the following command to list the detected 1-Wire devices:
+        <div
+          style="background-color: #2e3440; padding: 10px; border-radius: 5px"
+        >
+          <pre
+            style="
+              font-size: 18px;
+              background-color: #2e3440;
+              color: #d8dee9;
+              padding: 10px;
+              border-radius: 5px;
+            "
+          ><span style="color: #61afef;">ls</span> /sys/bus/w1/devices/
+                    </pre>
+        </div>
+      </li>
+      <li>
+        You should see a directory that starts with <code>28-</code>, followed
+        by the sensor's unique ID.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Read the temperature from the sensor:</strong></p>
+    <ul>
+      <li>
+        Navigate to the directory containing the sensor data:
+        <div
+          style="background-color: #2e3440; padding: 10px; border-radius: 5px"
+        >
+          <pre
+            style="
+              font-size: 18px;
+              background-color: #2e3440;
+              color: #d8dee9;
+              padding: 10px;
+              border-radius: 5px;
+            "
+          ><span style="color: #61afef;">cd</span> /sys/bus/w1/devices/28-xxxx <span style="color: #98c379;"># Replace 'xxxx' with your sensor ID</span>
+                    </pre>
+        </div>
+      </li>
+      <li>
+        Read the raw temperature data by viewing the <code>w1_slave</code> file:
+        <div
+          style="background-color: #2e3440; padding: 10px; border-radius: 5px"
+        >
+          <pre
+            style="
+              font-size: 18px;
+              background-color: #2e3440;
+              color: #d8dee9;
+              padding: 10px;
+              border-radius: 5px;
+            "
+          ><span style="color: #61afef;">cat</span> w1_slave
+                    </pre>
+        </div>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Interpret the raw output:</strong></p>
+    <ul>
+      <li>
+        The output will look something like this:
+        <div
+          style="background-color: #2e3440; padding: 10px; border-radius: 5px"
+        >
+          <pre
+            style="
+              font-size: 18px;
+              background-color: #2e3440;
+              color: #d8dee9;
+              padding: 10px;
+              border-radius: 5px;
+            "
+          ><span style="color: #d19a66;">04</span> <span style="color: #d19a66;">01</span> <span style="color: #c678dd;">4b</span> <span style="color: #d19a66;">46</span> <span style="color: #d19a66;">7f</span> ff <span style="color: #d19a66;">0c</span> <span style="color: #d19a66;">10</span> <span style="color: #d19a66;">92</span> : crc=<span style="color: #d19a66;">92</span> YES<br />
+<span style="color: #d19a66;">04</span> <span style="color: #d19a66;">01</span> <span style="color: #c678dd;">4b</span> <span style="color: #d19a66;">46</span> <span style="color: #d19a66;">7f</span> ff <span style="color: #d19a66;">0c</span> <span style="color: #d19a66;">10</span> <span style="color: #d19a66;">92</span> t=<span style="color: #e8fd00;">22500</span>
+                    </pre>
+        </div>
+      </li>
+      <li>
+        The temperature is shown after the <code>t=</code>. In this example,
+        <code>22500</code> represents a temperature of 22.5&deg;C.
+      </li>
+      <li>
+        This output demonstrates how the DS18B20 sensor transmits temperature as
+        digital data in a binary format, which is then converted into a readable
+        temperature value by the Raspberry Pi.
+      </li>
+    </ul>
+  </li>
+</ol>
+<h4>Example Output:</h4>
+<div style="background-color: #2e3440; padding: 10px; border-radius: 5px">
+  <pre
+    style="
+      font-size: 18px;
+      background-color: #2e3440;
+      color: #d8dee9;
+      padding: 10px;
+      border-radius: 5px;
+    "
+  ><span style="color: #d19a66;">04</span> <span style="color: #d19a66;">01</span> <span style="color: #c678dd;">4b</span> <span style="color: #d19a66;">46</span> <span style="color: #d19a66;">7f</span> ff <span style="color: #d19a66;">0c</span> <span style="color: #d19a66;">10</span> <span style="color: #d19a66;">92</span> : crc=<span style="color: #d19a66;">92</span> YES<br />
+<span style="color: #d19a66;">04</span> <span style="color: #d19a66;">01</span> <span style="color: #c678dd;">4b</span> <span style="color: #d19a66;">46</span> <span style="color: #d19a66;">7f</span> ff <span style="color: #d19a66;">0c</span> <span style="color: #d19a66;">10</span> <span style="color: #d19a66;">92</span> t=<span style="color: #e8fd00;">22500</span>
+    </pre>
+</div>
+<p>
+  <strong>Note:</strong> The example shown here is based on running this command
+  on the Raspberry Pi terminal. Your sensor ID will differ from the one in this
+  example, as each sensor has a unique serial number.
+</p>
+<p>
+  <img
+    src="https://weber.instructure.com/courses/591482/files/115153669/preview"
+    alt="cat_slave_output.PNG"
+    data-api-endpoint="https://weber.instructure.com/api/v1/courses/591482/files/115153669"
+    data-api-returntype="File"
+  />
+</p>
+<h4>Assignment:</h4>
+<p>
+  For this assignment, submit a picture of your Raspberry Pi terminal showing
+  the temperature reading from your DS18B20 sensor. Ensure your setup and sensor
+  output are visible in the image. This example highlights how the sensor
+  transmits temperature information as a digital signal in binary format, which
+  is then processed by the Raspberry Pi to display a readable temperature value.
+</p>
